@@ -54,6 +54,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -350,7 +351,7 @@ class MainActivity : ComponentActivity() {
 
 }
 
-
+/*
 @Composable
 fun GisMemoNavHost(
     navController: NavHostController
@@ -451,9 +452,9 @@ fun GisMemoNavHost(
     }
 
 }
+*/
 
-
-
+/*
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -533,4 +534,4 @@ fun ChkNetWork(
     }
 
 }
-
+*/

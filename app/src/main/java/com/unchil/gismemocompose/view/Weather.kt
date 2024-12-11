@@ -39,7 +39,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.LocationServices
-import com.unchil.gismemocompose.ChkNetWork
+import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

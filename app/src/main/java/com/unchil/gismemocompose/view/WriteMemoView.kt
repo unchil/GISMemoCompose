@@ -69,7 +69,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.*
 import com.google.maps.android.compose.widgets.ScaleBar
-import com.unchil.gismemocompose.ChkNetWork
+import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay

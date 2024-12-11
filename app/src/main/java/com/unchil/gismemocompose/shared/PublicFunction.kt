@@ -1,5 +1,7 @@
 package com.unchil.gismemocompose.shared
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -8,14 +10,109 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.biometric.BiometricManager
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 
 import androidx.core.content.FileProvider
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.RepositoryProvider
 import com.unchil.gismemocompose.db.LuckMemoDB
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
+import com.unchil.gismemocompose.shared.composables.CheckPermission
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
 
 import java.io.File
 
+
+@SuppressLint("UnrememberedMutableState")
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun ChkNetWork(
+    onCheckState:()->Unit
+){
+    val context = LocalContext.current
+    val permissions = listOf(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE)
+    val multiplePermissionsState = rememberMultiplePermissionsState(permissions)
+    CheckPermission(multiplePermissionsState = multiplePermissionsState)
+    var isGranted by mutableStateOf(true)
+
+    permissions.forEach { chkPermission ->
+        isGranted = isGranted && multiplePermissionsState.permissions.find {
+            it.permission == chkPermission
+        }?.status?.isGranted ?: false
+    }
+
+    PermissionRequiredCompose(
+        isGranted = isGranted,
+        multiplePermissions = permissions
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .padding(top = 60.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                text = "Gis Momo"
+            )
+
+            Image(
+                painter =  painterResource(R.drawable.baseline_wifi_off_black_48),
+                modifier = Modifier
+                    .clip(ShapeDefaults.Medium)
+                    .width(160.dp)
+                    .height(160.dp),
+                contentDescription = "not Connected",
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+            )
+
+            Button(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 60.dp),
+                onClick = {
+                    onCheckState()
+                }
+            ) {
+                Text(context.resources.getString(R.string.chkNetWork_msg))
+            }
+        }
+
+    }
+}
 
 
 fun Context.checkInternetConnected() :Boolean  {
