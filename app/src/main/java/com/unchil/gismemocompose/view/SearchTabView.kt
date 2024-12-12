@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowRight
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -479,11 +480,11 @@ fun SearchView(
             ) { }
 
 
-            Divider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp)
-            )
+        HorizontalDivider(
+            Modifier
+                .fillMaxWidth()
+                .padding(6.dp)
+        )
 
 
 
@@ -505,11 +506,11 @@ fun SearchView(
                 }
             }
 
-            Divider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp)
-            )
+        HorizontalDivider(
+            Modifier
+                .fillMaxWidth()
+                .padding(6.dp)
+        )
 
             RadioButtonGroupView(
                 state = markerRadioGroupState,
@@ -529,11 +530,11 @@ fun SearchView(
                 }
             }
 
-            Divider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp)
-            )
+        HorizontalDivider(
+            Modifier
+                .fillMaxWidth()
+                .padding(6.dp)
+        )
 
 
             androidx.compose.material.IconButton(
@@ -557,7 +558,7 @@ fun SearchView(
                             style = MaterialTheme.typography.titleSmall)
                         Icon(
                             modifier = Modifier.scale(1f),
-                            imageVector = if (isTagBox) Icons.Outlined.ArrowDropDown else Icons.Outlined.ArrowRight,
+                            imageVector = if (isTagBox) Icons.Outlined.ArrowDropDown else Icons.AutoMirrored.Outlined.ArrowRight,
                             contentDescription = "tag "
                         )
                     }
@@ -572,11 +573,11 @@ fun SearchView(
 
 
 
-        Divider(
+        HorizontalDivider(
             Modifier
                 .fillMaxWidth()
                 .padding(6.dp)
-            )
+        )
 
 
             androidx.compose.material.IconButton(
@@ -599,7 +600,7 @@ fun SearchView(
                             style = MaterialTheme.typography.titleSmall)
                         Icon(
                             modifier = Modifier.scale(1f),
-                            imageVector = if (isDateBox.value)  Icons.Outlined.ArrowDropDown else Icons.Outlined.ArrowRight,
+                            imageVector = if (isDateBox.value)  Icons.Outlined.ArrowDropDown else Icons.AutoMirrored.Outlined.ArrowRight,
                             contentDescription = "date "
                         )
                     }
@@ -832,7 +833,7 @@ private fun PrevSearchView(
 
                     ) {
 
-                        Divider()
+                        HorizontalDivider()
 
                         Row(
                             modifier = Modifier

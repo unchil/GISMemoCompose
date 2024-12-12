@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -245,7 +246,7 @@ fun SettingsView(navController: NavHostController){
             ) {
 
 
-                Divider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -361,7 +362,7 @@ fun SettingsView(navController: NavHostController){
 
 
 
-                Divider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
 
                 Row(
                     modifier = Modifier
@@ -387,7 +388,7 @@ fun SettingsView(navController: NavHostController){
                 )
 
 
-                Divider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
 
 
             }

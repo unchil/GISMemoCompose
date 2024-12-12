@@ -82,6 +82,7 @@ import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -222,7 +223,7 @@ fun CameraCompose( navController: NavController? = null   ) {
 
 
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
     val repository = LocalRepository.current
     val viewModel =   remember { CameraViewModel(repository = repository  ) }
@@ -887,7 +888,7 @@ fun VideoCameraFooter(
 @Composable
 fun CameraComposePreview(){
     val permissionsManager = PermissionsManager()
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
 
     CompositionLocalProvider(LocalPermissionsManager provides permissionsManager) {
         GISMemoTheme {

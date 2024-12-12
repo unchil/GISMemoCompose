@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -360,7 +361,7 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
 @Composable
 fun PrevSpeechRecognizerCompose(){
 
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
     val permissionsManager = PermissionsManager()
 
 

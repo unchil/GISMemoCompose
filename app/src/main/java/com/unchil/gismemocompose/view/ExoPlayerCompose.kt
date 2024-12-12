@@ -50,7 +50,7 @@ fun  ExoplayerCompose(
     trackInfo:((Int)->Unit)? = null ){
 
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
     var waveformProgress by remember { mutableStateOf(0F) }
 

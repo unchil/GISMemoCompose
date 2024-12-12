@@ -3,6 +3,7 @@ package com.unchil.gismemocompose.navigation
 import android.net.Uri
 import android.os.Bundle
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.Map
@@ -91,7 +92,7 @@ sealed class GisMemoDestinations(
     object IntroView : GisMemoDestinations(
         route = "introview",
         name = R.string.mainmenu_list,
-        icon = Icons.Outlined.FormatListBulleted
+        icon = Icons.AutoMirrored.Outlined.FormatListBulleted
     )
 
 
