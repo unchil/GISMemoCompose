@@ -30,7 +30,7 @@ Memos can be shared via e-mail through the *sharing function*.
 ```
 GoogleMap and OpenWeather api key required
  
-local.properties 
+secrets.properties
 {
   MAPS_API_KEY=
   OPENWEATHER_KEY=
