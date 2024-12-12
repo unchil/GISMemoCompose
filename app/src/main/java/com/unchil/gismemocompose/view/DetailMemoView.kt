@@ -2,15 +2,59 @@ package com.unchil.gismemocompose.view
 
 import android.Manifest
 import android.annotation.SuppressLint
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Api
+import androidx.compose.material.icons.outlined.BedtimeOff
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.FolderOpen
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.ModeOfTravel
+import androidx.compose.material.icons.outlined.OpenWith
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -20,18 +64,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.unchil.gismemocompose.LocalUsableDarkMode
-import com.unchil.gismemocompose.LocalUsableHaptic
-import com.unchil.gismemocompose.R
-import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
-import com.unchil.gismemocompose.db.entity.toCURRENTWEATHER_TBL
-import com.unchil.gismemocompose.shared.composables.CheckPermission
-import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
-import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
-import com.unchil.gismemocompose.viewmodel.DetailMemoViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -40,8 +72,27 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.widgets.ScaleBar
+import com.unchil.gismemocompose.LocalUsableDarkMode
+import com.unchil.gismemocompose.LocalUsableHaptic
+import com.unchil.gismemocompose.R
+import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.db.entity.toCURRENTWEATHER_TBL
+import com.unchil.gismemocompose.shared.composables.CheckPermission
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
+import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
+import com.unchil.gismemocompose.shared.utils.snackbarChannelList
+import com.unchil.gismemocompose.viewmodel.DetailMemoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -74,10 +125,11 @@ fun DetailMemoView(navController: NavController, id:Long) {
         viewType = PermissionRequiredComposeFuncName.MemoMap
     ) {
 
-    val db = LocalLuckMemoDB.current
+
+    val repository = LocalRepository.current
     val context = LocalContext.current
     val viewModel = remember {
-        DetailMemoViewModel(repository = RepositoryProvider.getRepository().apply { database = db })
+        DetailMemoViewModel(repository = repository)
     }
     val memoID by rememberSaveable { mutableStateOf(id) }
     //--------------

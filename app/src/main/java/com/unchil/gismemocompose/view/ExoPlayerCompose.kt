@@ -154,33 +154,34 @@ fun  ExoplayerCompose(
 
         }
 
-            DisposableEffect(
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    AndroidView(
-                        factory = { context ->
 
-                            PlayerView(context).apply {
-                                player = exoPlayer
-                                this.controllerShowTimeoutMs = 0
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            AndroidView(
+                factory = { context ->
 
-                                val params = FrameLayout.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT
-                                )
-                                layoutParams = params
-                            }
+                    PlayerView(context).apply {
+                        player = exoPlayer
+                        this.controllerShowTimeoutMs = 0
 
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            ) {
-                onDispose {
-                    exoPlayer.release()
-                }
+                        val params = FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                        )
+                        layoutParams = params
+                    }
+
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        DisposableEffect(key1 = exoPlayer){
+            onDispose {
+                exoPlayer.release()
             }
+        }
 
 
 

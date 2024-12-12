@@ -13,18 +13,79 @@ import android.view.MotionEvent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Api
+import androidx.compose.material.icons.outlined.BedtimeOff
+import androidx.compose.material.icons.outlined.Class
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Draw
+import androidx.compose.material.icons.outlined.FolderOpen
+import androidx.compose.material.icons.outlined.Forest
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.LocationOff
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.ModeOfTravel
+import androidx.compose.material.icons.outlined.OpenWith
+import androidx.compose.material.icons.outlined.Public
+import androidx.compose.material.icons.outlined.PublishedWithChanges
+import androidx.compose.material.icons.outlined.Replay
+import androidx.compose.material.icons.outlined.Screenshot
+import androidx.compose.material.icons.outlined.Swipe
+import androidx.compose.material.icons.outlined.Toll
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material.icons.rounded.Replay
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -45,20 +106,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.unchil.gismemocompose.LocalUsableDarkMode
-import com.unchil.gismemocompose.LocalUsableHaptic
-import com.unchil.gismemocompose.R
-import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
-import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
-import com.unchil.gismemocompose.model.*
-import com.unchil.gismemocompose.navigation.GisMemoDestinations
-import com.unchil.gismemocompose.shared.composables.*
-import com.unchil.gismemocompose.shared.utils.FileManager
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
-import com.unchil.gismemocompose.ui.theme.GISMemoTheme
-import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -67,17 +114,43 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.widgets.ScaleBar
+import com.unchil.gismemocompose.LocalUsableDarkMode
+import com.unchil.gismemocompose.LocalUsableHaptic
+import com.unchil.gismemocompose.R
+import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
+import com.unchil.gismemocompose.model.WriteMemoDataType
+import com.unchil.gismemocompose.navigation.GisMemoDestinations
 import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
+import com.unchil.gismemocompose.shared.composables.CheckPermission
+import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
+import com.unchil.gismemocompose.shared.composables.PermissionsManager
+import com.unchil.gismemocompose.shared.utils.FileManager
+import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
+import com.unchil.gismemocompose.shared.utils.snackbarChannelList
+import com.unchil.gismemocompose.ui.theme.GISMemoTheme
+import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 
 enum class DrawingMenu {
@@ -237,10 +310,11 @@ fun WriteMemoView(navController: NavController ){
 
         val context = LocalContext.current
         val lifecycleOwner = LocalLifecycleOwner.current
-        val db = LocalLuckMemoDB.current
+
+        val repository = LocalRepository.current
         val viewModel = remember {
             WriteMemoViewModel(
-                repository = RepositoryProvider.getRepository().apply { database = db })
+                repository = repository)
         }
 
         val isUsableHaptic = LocalUsableHaptic.current

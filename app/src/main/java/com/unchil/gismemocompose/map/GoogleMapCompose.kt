@@ -58,6 +58,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.*
 import com.google.maps.android.compose.widgets.ScaleBar
+import com.unchil.gismemocompose.data.LocalRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -346,10 +347,10 @@ fun MemoMapView(navController: NavController){
     }
 
     val context = LocalContext.current
-    val db = LocalLuckMemoDB.current
 
+    val repository = LocalRepository.current
     val viewModel = remember {
-        MemoMapViewModel(repository = RepositoryProvider.getRepository().apply { database = db }  )
+        MemoMapViewModel(repository = repository  )
     }
 
     val fusedLocationProviderClient = remember {

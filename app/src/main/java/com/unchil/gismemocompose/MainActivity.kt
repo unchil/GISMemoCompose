@@ -1,64 +1,68 @@
 package com.unchil.gismemocompose
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.*
-import androidx.navigation.navArgument
-import coil.size.Size
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
 import com.unchil.gismemocompose.db.LuckMemoDB
-import com.unchil.gismemocompose.navigation.GisMemoDestinations
 import com.unchil.gismemocompose.navigation.mainScreens
 import com.unchil.gismemocompose.navigation.navigateTo
-import com.unchil.gismemocompose.shared.composables.*
-import com.unchil.gismemocompose.ui.theme.GISMemoTheme
-import com.unchil.gismemocompose.view.*
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
+import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
+import com.unchil.gismemocompose.shared.composables.PermissionsManager
+import com.unchil.gismemocompose.ui.theme.GISMemoTheme
+import com.unchil.gismemocompose.view.GisMemoNavHost
+import com.unchil.gismemocompose.view.getLanguageArray
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Locale
 
 // SettingScreen 에서의 locale 변경시 실시간으로 SettingScreen 에 ReCompose 를 유도하기 위해
 val LocalChangeLocale = compositionLocalOf{ false }
@@ -71,10 +75,12 @@ class MainActivity : ComponentActivity() {
 
     private val permissionsManager = PermissionsManager()
 
+
     override fun attachBaseContext(context: Context?) {
 
         if(context != null ){
             context.let {
+
                 val luckMemoDB = LuckMemoDB.getInstance(context.applicationContext)
                 val repository = RepositoryProvider.getRepository().apply { database = luckMemoDB }
 
@@ -179,7 +185,6 @@ class MainActivity : ComponentActivity() {
                         LocalUsableDarkMode provides isUsableDarkMode.value,
                         LocalUsableDynamicColor provides isUsableDynamicColor.value,
                         LocalUsableHaptic provides isUsableHaptic.value,
-                        LocalLuckMemoDB provides luckMemoDB,
                         LocalRepository provides repository,
                         LocalPermissionsManager provides permissionsManager
                     ) {
@@ -350,188 +355,3 @@ class MainActivity : ComponentActivity() {
     }
 
 }
-
-/*
-@Composable
-fun GisMemoNavHost(
-    navController: NavHostController
-){
-
-    NavHost(
-        navController = navController,
-        startDestination = GisMemoDestinations.IntroView.route
-    ) {
-
-        composable(
-            route = GisMemoDestinations.IntroView.route
-        ){
-            IntroView(navController = navController)
-        }
-
-        composable(
-            route = GisMemoDestinations.WriteMemoView.route
-        ){
-            WriteMemoView(navController = navController)
-        }
-
-        composable(
-            route = GisMemoDestinations.MapView.route
-        ){
-            MemoMapView(navController = navController)
-        }
-
-        composable(
-            route = GisMemoDestinations.SettingView.route
-        ){
-            SettingsView(navController = navController)
-        }
-
-        composable(
-            route = GisMemoDestinations.DetailMemoView.route ,
-            arguments = listOf(
-                navArgument(GisMemoDestinations.ARG_NAME_ID){
-                    nullable = false
-                    type = NavType.StringType } )
-
-        ){
-            DetailMemoView(
-                navController = navController,
-                id = GisMemoDestinations.DetailMemoView.getIDFromArgs(it.arguments).toLong())
-        }
-
-        composable(
-            route = GisMemoDestinations.CameraCompose.route
-        ){
-            CameraCompose( navController = navController)
-        }
-
-        composable(
-            route = GisMemoDestinations.SpeechToText.route
-        ){
-            SpeechRecognizerCompose( navController = navController)
-        }
-
-        composable(
-            route =  GisMemoDestinations.PhotoPreview.route,
-            arguments = listOf(
-                navArgument(GisMemoDestinations.ARG_NAME_FILE_PATH) {
-                    nullable = false
-                    type = NavType.StringType})
-        ){
-            ImageViewer(
-                data = GisMemoDestinations.PhotoPreview.getUriFromArgs(it.arguments).toUri(),
-                size = Size.ORIGINAL,
-                isZoomable = true )
-        }
-
-
-        composable(
-            route = GisMemoDestinations.ExoPlayerView.route,
-            arguments = listOf(
-                navArgument(GisMemoDestinations.ARG_NAME_FILE_PATH) {
-                    nullable = false
-                    type = NavType.StringType},
-                navArgument(GisMemoDestinations.ARG_NAME_ISVISIBLE_AMPLITUDES) {
-                    nullable = false
-                    type = NavType.BoolType})
-        ){
-            ExoplayerCompose(
-                uri = GisMemoDestinations.ExoPlayerView.getUriFromArgs(it.arguments).toUri(),
-                isVisibleAmplitudes = GisMemoDestinations.ExoPlayerView.getIsVisibleAmplitudesFromArgs(it.arguments)
-            )
-        }
-
-
-
-    }
-
-
-    BackHandler {
-
-        navController.popBackStack()
-    }
-
-}
-*/
-
-/*
-@SuppressLint("UnrememberedMutableState")
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun ChkNetWork(
-    onCheckState:()->Unit
-){
-
-    val context = LocalContext.current
-
-    val permissions = listOf(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE)
-    val multiplePermissionsState = rememberMultiplePermissionsState(permissions)
-    CheckPermission(multiplePermissionsState = multiplePermissionsState)
-
-    var isGranted by mutableStateOf(true)
-
-    val isUsableDarkMode = LocalUsableDarkMode.current
-    val colorFilter: ColorFilter? = if(isUsableDarkMode){
-        ColorFilter.tint(Color.LightGray, blendMode = BlendMode.Darken)
-    }else {
-        null
-    }
-
-    permissions.forEach { chkPermission ->
-        isGranted = isGranted && multiplePermissionsState.permissions.find { it.permission == chkPermission }?.status?.isGranted
-                ?: false
-    }
-
-    PermissionRequiredCompose(
-        isGranted = isGranted,
-        multiplePermissions = permissions
-    ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .padding(top = 60.dp),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                text = "Gis Momo"
-            )
-
-            Image(
-                painter =  painterResource(R.drawable.baseline_wifi_off_black_48),
-                modifier = Modifier
-                    .clip(ShapeDefaults.Medium)
-                    .width(160.dp)
-                    .height(160.dp),
-                contentDescription = "not Connected",
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center,
-                colorFilter = colorFilter
-            )
-
-
-            Button(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 60.dp),
-                onClick = {
-                    onCheckState()
-                }
-            ) {
-                Text(context.resources.getString(R.string.chkNetWork_msg))
-            }
-
-
-        }
-
-
-    }
-
-}
-*/

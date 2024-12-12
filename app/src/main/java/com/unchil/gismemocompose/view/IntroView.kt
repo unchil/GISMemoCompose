@@ -8,7 +8,17 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,14 +28,49 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.LocationOff
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Publish
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -45,9 +90,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.size.Size
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.unchil.gismemocompose.LocalUsableHaptic
-import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
+import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
 import com.unchil.gismemocompose.model.BiometricCheckType
 import com.unchil.gismemocompose.model.ListItemBackgroundAction
@@ -60,11 +107,6 @@ import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
 import com.unchil.gismemocompose.shared.utils.snackbarChannelList
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.ListViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.unchil.gismemocompose.view.SearchView
-import com.unchil.gismemocompose.view.WeatherContent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -82,11 +124,12 @@ fun IntroView(
 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
-    val db = LocalLuckMemoDB.current
+
+    val repository = LocalRepository.current
     val coroutineScope = rememberCoroutineScope()
 
     val viewModel = remember {
-        ListViewModel(repository = RepositoryProvider.getRepository().apply { database = db }  )
+        ListViewModel(repository = repository  )
     }
 
 
@@ -414,7 +457,7 @@ fun MemoSwipeView(
 ){
 
     val context = LocalContext.current
-    val db = LocalLuckMemoDB.current
+    val repository = LocalRepository.current
 
 
     val isUsableHaptic = LocalUsableHaptic.current
@@ -461,7 +504,7 @@ fun MemoSwipeView(
                     }
                     BiometricCheckType.SHARE -> {
                         coroutineScope.launch {
-                            launchIntent_ShareMemo(context = context, memo = item, db = db )
+                            launchIntent_ShareMemo(context = context, memo = item, db = repository.database )
                         }
                     }
                     BiometricCheckType.DELETE -> {
@@ -585,7 +628,7 @@ fun MemoSwipeView(
                                 biometricPrompt(context, BiometricCheckType.SHARE, onResult)
                             }else {
                                 coroutineScope.launch {
-                                    launchIntent_ShareMemo(context = context, memo = item, db = db )
+                                    launchIntent_ShareMemo(context = context, memo = item, db = repository.database )
                                 }
                             }
 

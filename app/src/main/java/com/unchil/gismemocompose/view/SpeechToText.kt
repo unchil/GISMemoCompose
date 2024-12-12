@@ -10,8 +10,13 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
@@ -19,9 +24,21 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.rounded.HighlightOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -33,20 +50,23 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.unchil.gismemocompose.LocalUsableHaptic
-import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
-import com.unchil.gismemocompose.shared.composables.*
-import com.unchil.gismemocompose.shared.utils.FileManager
-import com.unchil.gismemocompose.ui.theme.GISMemoTheme
-import com.unchil.gismemocompose.viewmodel.SpeechToTextViewModel
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.unchil.gismemocompose.LocalUsableHaptic
+import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.shared.composables.CheckPermission
+import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
+import com.unchil.gismemocompose.shared.composables.PermissionsManager
+import com.unchil.gismemocompose.shared.utils.FileManager
+import com.unchil.gismemocompose.ui.theme.GISMemoTheme
+import com.unchil.gismemocompose.viewmodel.SpeechToTextViewModel
 import kotlinx.coroutines.launch
 import java.io.FileOutputStream
-import java.util.*
+import java.util.Locale
 
 
 val recognizerIntent =  {
@@ -160,9 +180,9 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
 
     val context = LocalContext.current
 
-    val db = LocalLuckMemoDB.current
+    val repository = LocalRepository.current
     val viewModel = remember {
-        SpeechToTextViewModel (repository = RepositoryProvider.getRepository().apply { database = db }  )
+        SpeechToTextViewModel (repository = repository )
     }
 
     val currentBackStack by navController.currentBackStackEntryAsState()

@@ -6,7 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -14,13 +22,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,12 +47,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.size.Size
 import com.unchil.gismemocompose.LocalUsableHaptic
-import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
-import com.unchil.gismemocompose.model.*
+import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.model.MemoData
+import com.unchil.gismemocompose.model.MemoDataContainerUser
+import com.unchil.gismemocompose.model.WriteMemoDataType
+import com.unchil.gismemocompose.model.WriteMemoDataTypeList
+import com.unchil.gismemocompose.model.getDesc
 import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
 import com.unchil.gismemocompose.shared.utils.snackbarChannelList
-import com.unchil.gismemocompose.view.AudioTextView
 import com.unchil.gismemocompose.viewmodel.MemoContainerViewModel
 import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import kotlinx.coroutines.channels.Channel
@@ -52,10 +69,11 @@ fun MemoDataContainer(
     channel: Channel<Int>? = null){
 
     val context = LocalContext.current
-    val db = LocalLuckMemoDB.current
+
+    val repository = LocalRepository.current
     val viewModel = remember {
         MemoContainerViewModel(
-            repository = RepositoryProvider.getRepository().apply { database = db } ,
+            repository = repository ,
             user = if (onEvent == null ) MemoDataContainerUser.DetailMemoView else MemoDataContainerUser.WriteMemoView
         )
     }
