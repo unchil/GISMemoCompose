@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
     private val permissionsManager = PermissionsManager()
 
     lateinit var repository:Repository
-    lateinit var viewModel: MainViewModel
+
 
     override fun attachBaseContext(context: Context?) {
 
@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
 
             val luckMemoDB = LuckMemoDB.getInstance(context.applicationContext)
             repository = RepositoryProvider.getRepository().apply { database = luckMemoDB }
-            viewModel =  MainViewModel( repository = repository )
+            val viewModel =  MainViewModel( repository = repository )
 
             if(viewModel.isFirstSetup.value){
                 viewModel.onEvent(MainViewModel.Event.UpdateIsFirstSetup(false))
