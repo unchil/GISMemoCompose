@@ -130,6 +130,7 @@ import com.unchil.gismemocompose.LocalUsableDarkMode
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.db.TagInfoDataObject
 import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
 import com.unchil.gismemocompose.model.WriteMemoDataType
 import com.unchil.gismemocompose.navigation.GisMemoDestinations
@@ -558,7 +559,7 @@ fun WriteMemoView(navController: NavController ){
 
                 hapticProcessing()
                 selectedTagArray.value.clear()
-                tagInfoDataList.forEachIndexed { index, tagInfoData ->
+                TagInfoDataObject.entries.forEachIndexed { index, tagInfoData ->
                     if (tagInfoData.isSet.value) {
                         selectedTagArray.value.add(index)
                     }
@@ -585,7 +586,7 @@ fun WriteMemoView(navController: NavController ){
 
             var snippets = ""
             selectedTagArray.value.forEach {
-                 snippets = "${snippets} #${  context.resources.getString( tagInfoDataList[it].name)   }"
+                 snippets = "${snippets} #${  context.resources.getString( TagInfoDataObject.entries[it].name)   }"
             }
 
 

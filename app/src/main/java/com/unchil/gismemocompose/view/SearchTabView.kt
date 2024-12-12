@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
+import com.unchil.gismemocompose.db.TagInfoDataObject
 import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
@@ -41,48 +42,6 @@ import kotlinx.coroutines.launch
 
 typealias QueryData= Pair<SearchOption, SearchQueryDataValue>
 
-data class TagInfoData(
-    var icon : ImageVector,
-    var name: Int,
-    var isSet:MutableState<Boolean> = mutableStateOf(false)
-)
-
-val tagInfoDataList: List<TagInfoData> = listOf(
-    TagInfoData(Icons.Outlined.ShoppingCart, R.string.search_hashTag_ShoppingCart),
-    TagInfoData(Icons.Outlined.AccountBalance, R.string.search_hashTag_AccountBalance),
-    TagInfoData(Icons.Outlined.Store, R.string.search_hashTag_Store),
-    TagInfoData(Icons.Outlined.Theaters, R.string.search_hashTag_Theaters),
-    TagInfoData(Icons.Outlined.FlightTakeoff, R.string.search_hashTag_FlightTakeoff),
-    TagInfoData(Icons.Outlined.FlightLand, R.string.search_hashTag_FlightLand),
-    TagInfoData(Icons.Outlined.Hotel, R.string.search_hashTag_Hotel),
-    TagInfoData(Icons.Outlined.School, R.string.search_hashTag_School),
-    TagInfoData(Icons.Outlined.Hiking, R.string.search_hashTag_Hiking),
-    TagInfoData(Icons.Outlined.DownhillSkiing, R.string.search_hashTag_DownhillSkiing),
-    TagInfoData(Icons.Outlined.Kayaking, R.string.search_hashTag_Kayaking),
-    TagInfoData(Icons.Outlined.Skateboarding, R.string.search_hashTag_Skateboarding),
-    TagInfoData(Icons.Outlined.Snowboarding, R.string.search_hashTag_Snowboarding),
-    TagInfoData(Icons.Outlined.ScubaDiving, R.string.search_hashTag_ScubaDiving),
-    TagInfoData(Icons.Outlined.RollerSkating, R.string.search_hashTag_RollerSkating),
-    TagInfoData(Icons.Outlined.Photo, R.string.search_hashTag_Photo),
-    TagInfoData(Icons.Outlined.Restaurant, R.string.search_hashTag_Restaurant),
-    TagInfoData(Icons.Outlined.Park, R.string.search_hashTag_Park),
-    TagInfoData(Icons.Outlined.LocalCafe, R.string.search_hashTag_LocalCafe),
-    TagInfoData(Icons.Outlined.LocalTaxi, R.string.search_hashTag_LocalTaxi),
-    TagInfoData(Icons.Outlined.Forest, R.string.search_hashTag_Forest),
-    TagInfoData(Icons.Outlined.EvStation, R.string.search_hashTag_EvStation),
-    TagInfoData(Icons.Outlined.FitnessCenter, R.string.search_hashTag_FitnessCenter),
-    TagInfoData(Icons.Outlined.House, R.string.search_hashTag_House),
-    TagInfoData(Icons.Outlined.Apartment, R.string.search_hashTag_Apartment),
-    TagInfoData(Icons.Outlined.Cabin, R.string.search_hashTag_Cabin)
-).sortedBy {
-    it.name
-}
-
-fun  List<TagInfoData>.clear(){
-    this.forEach {
-        it.isSet.value = false
-    }
-}
 
 enum class SearchOption {
     TITLE, SECRET, MARKER, TAG, DATE
@@ -643,9 +602,9 @@ fun AssistChipGroupView(
 
     val context = LocalContext.current
 
-    tagInfoDataList.clear()
+    TagInfoDataObject.clear()
     setState.value.forEach {
-        tagInfoDataList[it].isSet.value = true
+        TagInfoDataObject.entries[it].isSet.value = true
     }
 
     val  lazyStaggeredGridState = rememberLazyStaggeredGridState()
@@ -677,7 +636,7 @@ fun AssistChipGroupView(
                 horizontalItemSpacing = 6.dp,
                 userScrollEnabled = true,
             ){
-                itemsIndexed(tagInfoDataList) { index, it ->
+                itemsIndexed(TagInfoDataObject.entries) { index, it ->
                     AssistChip(
                         modifier = itemModifier,
                         shape = ShapeDefaults.ExtraSmall,
@@ -730,9 +689,9 @@ fun AssistChipGroupViewNew(
 
     val context = LocalContext.current
 
-    tagInfoDataList.clear()
+    TagInfoDataObject.clear()
     setState.value.forEach {
-        tagInfoDataList[it].isSet.value = true
+        TagInfoDataObject.entries[it].isSet.value = true
     }
 
     val  lazyStaggeredGridState = rememberLazyStaggeredGridState()
@@ -764,7 +723,7 @@ fun AssistChipGroupViewNew(
                 horizontalItemSpacing = 6.dp,
                 userScrollEnabled = true,
             ){
-                itemsIndexed(tagInfoDataList) { index, it ->
+                itemsIndexed(TagInfoDataObject.entries) { index, it ->
                     AssistChip(
                         modifier = itemModifier,
                         shape = ShapeDefaults.ExtraSmall,

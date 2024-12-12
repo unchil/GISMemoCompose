@@ -87,6 +87,7 @@ import com.unchil.gismemocompose.LocalUsableDarkMode
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.db.TagInfoDataObject
 import com.unchil.gismemocompose.db.entity.toCURRENTWEATHER_TBL
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
@@ -133,14 +134,19 @@ fun DetailMemoView(navController: NavController, id:Long) {
         DetailMemoViewModel(repository = repository)
     }
     val memoID by rememberSaveable { mutableStateOf(id) }
+
     //--------------
     LaunchedEffect(key1 = memoID) {
-        viewModel.onEvent(DetailMemoViewModel.Event.SetMemo(id = id))
-        viewModel.onEvent(DetailMemoViewModel.Event.SetWeather(id = id))
-        viewModel.onEvent(DetailMemoViewModel.Event.SetTags(id = id))
-        viewModel.onEvent(DetailMemoViewModel.Event.SetFiles(id = id))
+        viewModel.onEvent(DetailMemoViewModel.Event.SetDetailMemo(id = id))
     }
     //--------------
+
+    val memo = viewModel.memo.collectAsState()
+
+    val selectedTagArray = viewModel.tagArrayList.collectAsState()
+    val selectedTags =  mutableStateOf(selectedTagArray.value)
+    val weatherData = viewModel.weather.collectAsState()
+
 
     val isUsableHaptic = LocalUsableHaptic.current
     val hapticFeedback = LocalHapticFeedback.current
@@ -190,15 +196,11 @@ fun DetailMemoView(navController: NavController, id:Long) {
     var isTagDialog by rememberSaveable { mutableStateOf(false) }
     val isVisibleMenu = rememberSaveable { mutableStateOf(false) }
 
-    val memo = viewModel.memo.collectAsState()
-    val selectedTagArray = viewModel.tagArrayList.collectAsState()
-    val weatherData = viewModel.weather.collectAsState()
+
 
     val isLock = mutableStateOf(memo.value?.isSecret ?: false)
     val isMark = mutableStateOf(memo.value?.isPin ?: false)
     val snippets = mutableStateOf(memo.value?.snippets ?: "")
-
-    val selectedTags = remember{  mutableStateOf(selectedTagArray.value) }
 
     var isTitleBox by  rememberSaveable{  mutableStateOf(true)}
 
@@ -260,9 +262,12 @@ fun DetailMemoView(navController: NavController, id:Long) {
             hapticProcessing()
             selectedTags.value.clear()
             var snippetsTemp = ""
-            tagInfoDataList.forEachIndexed { index, tagInfoData ->
-                if (tagInfoData.isSet.value) {
-                    snippetsTemp = "${snippetsTemp } #${  context.resources.getString( tagInfoDataList[index].name)   }"
+            TagInfoDataObject.entries.forEachIndexed { index, item ->
+                if (item.isSet.value) {
+                    snippetsTemp = "$snippetsTemp #${  context.resources.getString(
+                        //  TagInfoDataList[index].name
+                        item.name
+                    )}"
                     selectedTags.value.add(index)
                 }
             }

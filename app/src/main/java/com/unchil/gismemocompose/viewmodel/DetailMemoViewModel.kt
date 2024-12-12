@@ -6,20 +6,51 @@ import androidx.navigation.NavController
 import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
 import com.unchil.gismemocompose.db.entity.MEMO_WEATHER_TBL
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class DetailMemoViewModel (val repository: Repository, ) : ViewModel() {
 
-    val memo:StateFlow<MEMO_TBL?>
-            = repository.selectedMemo
+    private val _memo: MutableStateFlow<MEMO_TBL?>
+            = MutableStateFlow(null)
+    val memo: StateFlow<MEMO_TBL?>
+            = _memo
 
-    val weather:StateFlow<MEMO_WEATHER_TBL?>
-            = repository.selectedWeather
+    private val _weather: MutableStateFlow<MEMO_WEATHER_TBL?>
+            = MutableStateFlow(null)
+    val weather: StateFlow<MEMO_WEATHER_TBL?>
+            = _weather
 
 
-    val tagArrayList: StateFlow< ArrayList<Int>>
-            = repository.selectedTagList
+    private val _tagArrayList: MutableStateFlow<ArrayList<Int>>
+            = MutableStateFlow(arrayListOf())
+    val tagArrayList: StateFlow<ArrayList<Int>>
+            = _tagArrayList
+
+
+    init {
+        viewModelScope.launch {
+            repository.selectedMemo.collectLatest {
+                _memo.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.selectedWeather.collectLatest {
+                _weather.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.selectedTagList.collectLatest {
+                _tagArrayList.value = it
+            }
+        }
+    }
+
+
 
 
     fun onEvent(event: Event) {
@@ -40,8 +71,29 @@ class DetailMemoViewModel (val repository: Repository, ) : ViewModel() {
             is Event.UpdateTagList ->{
                 updateTagList(event.id, event.selectTagList, event.snippets)
             }
+
+            is Event.SetDetailMemo -> {
+                setDetailMemo(event.id)
+            }
         }
 
+    }
+
+    private fun setDetailMemo(id:Long){
+        viewModelScope.launch {
+            repository.setMemo(id = id)
+        }
+        viewModelScope.launch {
+            repository.setFiles(id = id)
+        }
+
+        viewModelScope.launch {
+            repository.setTags(id = id)
+        }
+
+        viewModelScope.launch {
+            repository.setWeather(id = id)
+        }
     }
 
     private fun updateTagList(id:Long, selectTagList:  ArrayList<Int>, snippets:String){
@@ -96,10 +148,10 @@ class DetailMemoViewModel (val repository: Repository, ) : ViewModel() {
         data class  SetWeather(val id: Long): Event()
         data class  SetTags(val id: Long): Event()
         data class  SetFiles(val id: Long): Event()
+        data class SetDetailMemo(val id:Long): Event()
         data class UpdateIsSecret(val id: Long, val isSecret:Boolean): Event()
         data class UpdateIsMark(val id: Long, val isMark:Boolean): Event()
-
-   data class UpdateTagList(val id:Long, val   selectTagList:ArrayList<Int>, val snippets:String): Event()
+        data class UpdateTagList(val id:Long, val   selectTagList:ArrayList<Int>, val snippets:String): Event()
         data class ToRoute(val navController: NavController, val route:String) : Event()
     }
 
