@@ -12,7 +12,8 @@ Weather information provided by OpenWeather: [OpenWeatherMap][openweatherlink].
 
 Gis Memo App supports the use of haptics and night mode.
 
-Available languages include Korean, English, French, and Portuguese.
+
+Available languages include Korean, English, French, Portuguese, Spanish, Chinese.
  
 Memos are basically saved as snapshots of weather information and maps at the time and location of the memo.
 
