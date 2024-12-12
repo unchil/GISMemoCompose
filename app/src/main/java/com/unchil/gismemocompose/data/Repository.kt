@@ -45,6 +45,11 @@ class Repository{
     val isChangeLocale: MutableStateFlow<Int>
             = MutableStateFlow(0)
 
+    // locale 실시간 반영을 위한 state
+    val realTimeChangeLocale: MutableStateFlow<Boolean>
+            = MutableStateFlow(false)
+
+
     val onChangeLocale: MutableStateFlow<Boolean>
             = MutableStateFlow(false)
 
@@ -88,6 +93,14 @@ class Repository{
         currentIsEraser.value = false
         currentPolylineList.value = listOf()
         currentSnapShot.value = listOf()
+    }
+
+    fun updateIsFirstSetup(value:Boolean){
+        isFirstSetup.value = value
+    }
+
+    fun updateRealTimeChangeLocale(value:Boolean){
+        realTimeChangeLocale.value = value
     }
 
     fun updateIsUsableHaptic(value:Boolean){

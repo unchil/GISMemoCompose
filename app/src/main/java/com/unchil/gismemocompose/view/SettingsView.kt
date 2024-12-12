@@ -97,9 +97,7 @@ fun Context.getLanguageArray():Array<String>{
 
 @Composable
 fun SettingsView(navController: NavHostController){
-
-
-
+// LocalChangeLocale.current 값 호출로 locale 실시간 반영
     val localeChange = LocalChangeLocale.current
     var context = LocalContext.current
 
@@ -179,7 +177,6 @@ fun SettingsView(navController: NavHostController){
     }
 
     LaunchedEffect(key1 = localeRadioGroupState.value ){
-        isLocaleChange = !isLocaleChange
 
         val locale = Locale( languageArray[localeRadioGroupState.value] )
 
@@ -188,8 +185,12 @@ fun SettingsView(navController: NavHostController){
         context.resources.configuration.setLocale(locale)
         context.resources.configuration.setLayoutDirection(locale)
        context.resources.updateConfiguration( context.resources.configuration, context.resources.displayMetrics)
-        viewModel.onEvent(SettingsViewModel.Event.UpdateOnChangeLocale(isLocaleChange))
         viewModel.onEvent(SettingsViewModel.Event.UpdateIsChangeLocale(localeRadioGroupState.value))
+
+
+        // locale change 실시간 반영을 위한 dummy event 발생
+        isLocaleChange = !isLocaleChange
+        viewModel.onEvent(SettingsViewModel.Event.UpdateOnChangeLocale(isLocaleChange))
     }
 
 

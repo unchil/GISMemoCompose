@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.data.RepositoryProvider
 import com.unchil.gismemocompose.db.LuckMemoDB
 import com.unchil.gismemocompose.navigation.mainScreens
@@ -60,6 +61,7 @@ import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.view.GisMemoNavHost
 import com.unchil.gismemocompose.view.getLanguageArray
+import com.unchil.gismemocompose.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -75,29 +77,32 @@ class MainActivity : ComponentActivity() {
 
     private val permissionsManager = PermissionsManager()
 
+    lateinit var repository:Repository
+    lateinit var viewModel: MainViewModel
 
     override fun attachBaseContext(context: Context?) {
 
         if(context != null ){
-            context.let {
 
-                val luckMemoDB = LuckMemoDB.getInstance(context.applicationContext)
-                val repository = RepositoryProvider.getRepository().apply { database = luckMemoDB }
+            val luckMemoDB = LuckMemoDB.getInstance(context.applicationContext)
+            repository = RepositoryProvider.getRepository().apply { database = luckMemoDB }
+            viewModel =  MainViewModel( repository = repository )
 
-                if(repository.isFirstSetup.value){
-                    repository.isFirstSetup.value = false
-                    val index = context.getLanguageArray().indexOf(Locale.getDefault().language)
-                    repository.isChangeLocale.value = if (index == -1 ) 0 else index
-                    super.attachBaseContext(context)
-                } else {
-                    val locale = Locale( context.getLanguageArray()[    repository.isChangeLocale.value    ] )
-                    Locale.setDefault(locale)
-                    context.resources.configuration.setLayoutDirection(locale)
-                    it.resources.configuration.setLocale(locale)
-                    it.createConfigurationContext(it.resources.configuration)
-                    super.attachBaseContext(it.createConfigurationContext(it.resources.configuration))
-                }
+            if(viewModel.isFirstSetup.value){
+                viewModel.onEvent(MainViewModel.Event.UpdateIsFirstSetup(false))
+                val index = context.getLanguageArray().indexOf(Locale.getDefault().language)
+                viewModel.onEvent(MainViewModel.Event.UpdateIsChangeLocale(if (index == -1 ) 0 else index))
+                super.attachBaseContext(context)
+            } else {
+                val locale = Locale( context.getLanguageArray()[viewModel.isChangeLocale.value] )
+                Locale.setDefault(locale)
+                context.resources.configuration.setLayoutDirection(locale)
+                context.resources.configuration.setLocale(locale)
+                context.createConfigurationContext(context.resources.configuration)
+                super.attachBaseContext(context.createConfigurationContext(context.resources.configuration))
             }
+
+
         }else {
             super.attachBaseContext(context)
         }
@@ -114,8 +119,6 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val context = LocalContext.current
-            val luckMemoDB = LuckMemoDB.getInstance(context.applicationContext)
-            val repository = RepositoryProvider.getRepository().apply { database = luckMemoDB }
             val onChangeLocale = repository.onChangeLocale.collectAsState()
             val isUsableHaptic = repository.isUsableHaptic.collectAsState()
             val isUsableDarkMode = repository.isUsableDarkMode.collectAsState()
