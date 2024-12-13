@@ -120,7 +120,7 @@ fun ImageViewer(
                     contentAlignment = Alignment.Center,
                     modifier = boxModifier
                 ){
-                    androidx.compose.material.CircularProgressIndicator(
+                    CircularProgressIndicator(
                         color = Color.Gray,
                         modifier = Modifier.align(Alignment.Center)
                     )
