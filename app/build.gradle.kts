@@ -97,14 +97,11 @@ dependencies {
     implementation(libs.androidx.concurrent.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.google.accompanist.navigation)
-
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.google.accompanist.webview)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.ui)
-
-   // implementation(libs.coil.kt.compose)
     implementation(libs.coil)
     implementation(libs.coil.core)
     implementation(libs.coil.compose)
