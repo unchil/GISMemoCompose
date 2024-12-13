@@ -190,7 +190,7 @@ fun PagerSnapShotView(item: MemoData.SnapShot, onDelete:((page:Int) -> Unit)? = 
         }
     }
 
-    val pagerState  =   rememberPagerState(initialPage = 0){100}
+    val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
     val defaultData:Pair<String, Int> =  Pair(
          context.resources.getString(WriteMemoDataType.SNAPSHOT.getDesc().first )
         , item.dataList.size)
@@ -305,7 +305,7 @@ fun PagerAudioTextView(item: MemoData.AudioText, onDelete:((page:Int) -> Unit)? 
         }
     }
 
-    val pagerState  =   rememberPagerState(initialPage = 0){100}
+    val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
     val defaultData:Pair<String, Int> = Pair(
         context.resources.getString(WriteMemoDataType.AUDIOTEXT.getDesc().first )
         , item.dataList.size)
@@ -433,7 +433,7 @@ fun PagerPhotoView(item: MemoData.Photo, onDelete:((page:Int) -> Unit)? = null, 
         }
     }
 
-    val pagerState  =   rememberPagerState(initialPage = 0){100}
+    val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
 
     val defaultData:Pair<String, Int> = Pair(
         context.resources.getString(WriteMemoDataType.PHOTO.getDesc().first )
