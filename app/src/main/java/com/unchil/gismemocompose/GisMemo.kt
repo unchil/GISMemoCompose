@@ -12,17 +12,22 @@ import coil3.request.crossfade
 import coil3.util.DebugLogger
 import io.ktor.client.HttpClient
 
-@OptIn(ExperimentalCoilApi::class)
-fun KtorNetworkFetcherFactory() = NetworkFetcher.Factory(
-    networkClient = { HttpClient().asNetworkClient() }
-)
+
 
 class GisMemo : Application(), SingletonImageLoader.Factory {
+
+    val KtorNetwork = { HttpClient().asNetworkClient() }
+
+    @OptIn(ExperimentalCoilApi::class)
+    val NetworkFetcherFactory = NetworkFetcher.Factory(
+        networkClient = KtorNetwork
+    )
+
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
             .crossfade(true) // 이미지가 로드되면서 서서히 보여지는 효과 적용
             .components{
-                add(factory = KtorNetworkFetcherFactory())
+                add(factory = NetworkFetcherFactory)
             }
             .memoryCache {
                 MemoryCache.Builder()
