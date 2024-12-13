@@ -144,11 +144,11 @@ fun ImageViewer(
                     contentAlignment = Alignment.Center,
                     modifier = boxModifier.padding(10.dp)
                 ){
-/*
+
                     Image(
                         painterResource(R.drawable.outline_perm_media_black_48),
                         contentDescription = "",
-                        contentScale = ContentScale.FillWidth,
+                        contentScale = ContentScale.None,
                         modifier = imageModifier
                     )
 
@@ -165,8 +165,6 @@ fun ImageViewer(
                         style = MaterialTheme.typography.titleMedium
                     )
 
- */
-
                 }
 
             }
@@ -178,7 +176,7 @@ fun ImageViewer(
                     Image(
                         painterResource(R.drawable.outline_perm_media_black_48),
                         contentDescription = "",
-                        contentScale = ContentScale.FillWidth,
+                        contentScale = ContentScale.None,
                         modifier = imageModifier
                     )
 

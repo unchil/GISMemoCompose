@@ -20,7 +20,7 @@ fun KtorNetworkFetcherFactory() = NetworkFetcher.Factory(
 class GisMemo : Application(), SingletonImageLoader.Factory {
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
-            .crossfade(true)
+            .crossfade(true) // 이미지가 로드되면서 서서히 보여지는 효과 적용
             .components{
                 add(factory = KtorNetworkFetcherFactory())
             }
