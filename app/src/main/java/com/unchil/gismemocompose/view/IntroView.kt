@@ -98,13 +98,12 @@ import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
 import com.unchil.gismemocompose.model.BiometricCheckType
 import com.unchil.gismemocompose.model.ListItemBackgroundAction
+import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.model.getDesc
 import com.unchil.gismemocompose.navigation.GisMemoDestinations
 import com.unchil.gismemocompose.shared.composables.biometricPrompt
 import com.unchil.gismemocompose.shared.launchIntent_Biometric_Enroll
 import com.unchil.gismemocompose.shared.launchIntent_ShareMemo
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.ListViewModel
 import kotlinx.coroutines.channels.Channel
@@ -133,7 +132,7 @@ fun IntroView(
     }
 
 
-    val memoListStream = viewModel.memoListPaging.collectAsLazyPagingItems()
+    val result = viewModel.memoListPaging.collectAsLazyPagingItems()
     val isRefreshing = viewModel.isRefreshing.collectAsState()
     val isSearchRefreshing: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 
@@ -212,34 +211,31 @@ fun IntroView(
 
     LaunchedEffect(channel) {
         channel.receiveAsFlow().collect { index ->
-            val channelData = snackbarChannelList.first {
-                it.channel == index
+            val channelInfo = SnackBarChannelObject.entries.first {item ->
+                item.channel == index
             }
-
             //----------
-            val message = when (channelData.channelType) {
-                SnackBarChannelType.SEARCH_RESULT -> {
-
-                    context.resources.getString( channelData.message) + "[${memoListStream.itemCount}]"
+            val message = when (channelInfo.channelType) {
+                SnackBarChannelObject.Type.SEARCH_RESULT -> {
+                    context.resources.getString( channelInfo.message) + "[${result.itemCount}]"
                 }
                 else -> {
-                    context.resources.getString( channelData.message)
+                    context.resources.getString( channelInfo.message)
                 }
             }
             //----------
 
-            val result = snackBarHostState.showSnackbar(
+            val snackBar = snackBarHostState.showSnackbar(
                 message =   message,
-                actionLabel = channelData.actionLabel,
-                withDismissAction = channelData.withDismissAction,
-                duration = channelData.duration
+                actionLabel = channelInfo.actionLabel,
+                withDismissAction = channelInfo.withDismissAction,
+                duration = channelInfo.duration
             )
-            when (result) {
+            when (snackBar) {
                 SnackbarResult.ActionPerformed -> {
                     hapticProcessing()
                     //----------
-                    when (channelData.channelType) {
-
+                    when (channelInfo.channelType) {
                         else -> {}
                     }
                     //----------
@@ -251,17 +247,19 @@ fun IntroView(
         }
     }
 
-    LaunchedEffect(key1 = memoListStream.loadState.source.refresh,) {
+    LaunchedEffect(key1 = result.loadState.source.refresh,) {
         if (!isRefreshing.value) {
-            when (memoListStream.loadState.source.refresh) {
+            when (result.loadState.source.refresh) {
                 is LoadState.Error -> {}
                 LoadState.Loading -> {}
                 is LoadState.NotLoading -> {
 
                     if (isSearchRefreshing.value) {
-                        channel.trySend(snackbarChannelList.first {
-                            it.channelType == SnackBarChannelType.SEARCH_RESULT
+
+                        channel.trySend(SnackBarChannelObject.entries.first {item ->
+                            item.channelType == SnackBarChannelObject.Type.SEARCH_RESULT
                         }.channel)
+
                         isSearchRefreshing.value = false
                     }
 
@@ -282,9 +280,11 @@ fun IntroView(
             sheetControl = sheetControl,
             onEvent = viewModel.eventHandler
         ) {
-            channel.trySend(snackbarChannelList.first {
-                it.channelType == SnackBarChannelType.SEARCH_CLEAR
+
+            channel.trySend(SnackBarChannelObject.entries.first {item ->
+                item.channelType == SnackBarChannelObject.Type.SEARCH_CLEAR
             }.channel)
+
         }
     }
 
@@ -366,9 +366,11 @@ fun IntroView(
                                 .padding(vertical = 2.dp)) {
                                 WeatherContent{
                                     if(!it){
-                                        channel.trySend(snackbarChannelList.first {
-                                            it.channelType == SnackBarChannelType.LOCATION_SERVICE_DISABLE
+                                        channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                            item.channelType == SnackBarChannelObject.Type.LOCATION_SERVICE_DISABLE
                                         }.channel)
+
+
                                     }
                                 }
                             }
@@ -398,16 +400,18 @@ fun IntroView(
                                     stickyHeader {
                                         WeatherContent{
                                             if(!it){
-                                                channel.trySend(snackbarChannelList.first {
-                                                    it.channelType == SnackBarChannelType.LOCATION_SERVICE_DISABLE
+
+                                                channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                                    item.channelType == SnackBarChannelObject.Type.LOCATION_SERVICE_DISABLE
                                                 }.channel)
+
                                             }
                                         }
                                     }
                                 }
 
-                                items(memoListStream.itemCount) {
-                                    memoListStream[it]?.let { memo ->
+                                items(result.itemCount) {
+                                    result[it]?.let { memo ->
                                         MemoSwipeView(
                                             item = memo,
                                             channel = channel,
@@ -512,19 +516,20 @@ fun MemoSwipeView(
                             event(  ListViewModel.Event.DeleteItem(id = item.id) )
                         }
                         channel?.let {channel ->
-                            channel.trySend(snackbarChannelList.first {
-                                it.channelType == SnackBarChannelType.MEMO_DELETE
+
+                            channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                item.channelType == SnackBarChannelObject.Type.MEMO_DELETE
                             }.channel)
+
                         }
                     }
                 }
             }else {
                 channel?.let {channel ->
-                    channel.trySend(
-                        snackbarChannelList.first {
-                            it.channelType == SnackBarChannelType.AUTHENTICATION_FAILED
-                        }.channel
-                    )
+                    channel.trySend(SnackBarChannelObject.entries.first {item ->
+                        item.channelType == SnackBarChannelObject.Type.AUTHENTICATION_FAILED
+                    }.channel)
+
                 }
 
             }
@@ -579,9 +584,11 @@ fun MemoSwipeView(
                 launchIntent_Biometric_Enroll(context)
             }
             else -> {
-                channel?.trySend(snackbarChannelList.first {
-                    it.channelType == SnackBarChannelType.BIOMETRIC_NO_SUCCESS
+
+                channel?.trySend(SnackBarChannelObject.entries.first {item ->
+                    item.channelType == SnackBarChannelObject.Type.BIOMETRIC_NO_SUCCESS
                 }.channel)
+
             }
         }
 
@@ -643,8 +650,8 @@ fun MemoSwipeView(
                                     event(  ListViewModel.Event.DeleteItem(id = item.id) )
                                 }
                                 channel?.let {channel ->
-                                    channel.trySend(snackbarChannelList.first {
-                                        it.channelType == SnackBarChannelType.MEMO_DELETE
+                                    channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                        item.channelType == SnackBarChannelObject.Type.MEMO_DELETE
                                     }.channel)
                                 }
                             }

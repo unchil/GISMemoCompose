@@ -50,11 +50,11 @@ import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.model.MemoData
 import com.unchil.gismemocompose.model.MemoDataContainerUser
+import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.model.WriteMemoDataType
 import com.unchil.gismemocompose.model.WriteMemoDataTypeList
 import com.unchil.gismemocompose.model.getDesc
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
+
 import com.unchil.gismemocompose.viewmodel.MemoContainerViewModel
 import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import kotlinx.coroutines.channels.Channel
@@ -225,8 +225,9 @@ fun PagerSnapShotView(item: MemoData.SnapShot, onDelete:((page:Int) -> Unit)? = 
                             hapticProcessing()
                             it(pagerState.currentPage)
                             channel?.let { channel ->
-                                channel.trySend(snackbarChannelList.first { snackBarChannelData ->
-                                    snackBarChannelData.channelType == SnackBarChannelType.ITEM_DELETE
+
+                                channel.trySend(SnackBarChannelObject.entries.first { item ->
+                                    item.channelType == SnackBarChannelObject.Type.ITEM_DELETE
                                 }.channel)
                             }
                         },
@@ -339,8 +340,9 @@ fun PagerAudioTextView(item: MemoData.AudioText, onDelete:((page:Int) -> Unit)? 
                             hapticProcessing()
                             it(pagerState.currentPage)
                             channel?.let { channel ->
-                                channel.trySend(snackbarChannelList.first { snackBarChannelData ->
-                                    snackBarChannelData.channelType == SnackBarChannelType.ITEM_DELETE
+
+                                channel.trySend(SnackBarChannelObject.entries.first { item ->
+                                    item.channelType == SnackBarChannelObject.Type.ITEM_DELETE
                                 }.channel)
                             }
                         },
@@ -468,8 +470,8 @@ fun PagerPhotoView(item: MemoData.Photo, onDelete:((page:Int) -> Unit)? = null, 
                             hapticProcessing()
                             it(pagerState.currentPage)
                             channel?.let { channel ->
-                                channel.trySend(snackbarChannelList.first { snackBarChannelData ->
-                                    snackBarChannelData.channelType == SnackBarChannelType.ITEM_DELETE
+                                channel.trySend(SnackBarChannelObject.entries.first { item ->
+                                    item.channelType == SnackBarChannelObject.Type.ITEM_DELETE
                                 }.channel)
                             }
                         },
@@ -587,8 +589,8 @@ fun PagerVideoView(item: MemoData.Video, onDelete:((page:Int) -> Unit)? = null, 
                             hapticProcessing()
                             it(videoTrackIndex)
                             channel?.let { channel ->
-                                channel.trySend(snackbarChannelList.first { snackBarChannelData ->
-                                    snackBarChannelData.channelType == SnackBarChannelType.ITEM_DELETE
+                                channel.trySend(SnackBarChannelObject.entries.first { item ->
+                                    item.channelType == SnackBarChannelObject.Type.ITEM_DELETE
                                 }.channel)
                             }
                         },

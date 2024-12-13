@@ -32,7 +32,6 @@ import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.ModeOfTravel
 import androidx.compose.material.icons.outlined.OpenWith
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -87,13 +86,12 @@ import com.unchil.gismemocompose.LocalUsableDarkMode
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
-import com.unchil.gismemocompose.db.TagInfoDataObject
+import com.unchil.gismemocompose.model.TagInfoDataObject
 import com.unchil.gismemocompose.db.entity.toCURRENTWEATHER_TBL
+import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
 import com.unchil.gismemocompose.viewmodel.DetailMemoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -105,7 +103,6 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun DetailMemoView(navController: NavController, id:Long) {
-
 
     val permissions = listOf(
         Manifest.permission.INTERNET,
@@ -232,10 +229,9 @@ fun DetailMemoView(navController: NavController, id:Long) {
     LaunchedEffect(channel) {
 
         channel.receiveAsFlow().collect { index ->
-            val channelData = snackbarChannelList.first {
-                it.channel == index
+            val channelData = SnackBarChannelObject.entries.first { item ->
+                item.channel == index
             }
-
             val result = snackbarHostState.showSnackbar(
                 message = context.resources.getString( channelData.message),
                 actionLabel = channelData.actionLabel,
@@ -284,8 +280,9 @@ fun DetailMemoView(navController: NavController, id:Long) {
     val checkEnableLocationService: () -> Unit = {
         fusedLocationProviderClient.lastLocation.addOnCompleteListener(context.mainExecutor) { task ->
             if (!task.isSuccessful || task.result == null) {
-                channel.trySend(snackbarChannelList.first {
-                    it.channelType == SnackBarChannelType.LOCATION_SERVICE_DISABLE
+
+                channel.trySend(SnackBarChannelObject.entries.first {item ->
+                    item.channelType == SnackBarChannelObject.Type.LOCATION_SERVICE_DISABLE
                 }.channel)
             }
         }
@@ -619,10 +616,10 @@ fun DetailMemoView(navController: NavController, id:Long) {
                                         }
 
                                         val snackBarChannelType =
-                                            if (isLock.value) SnackBarChannelType.LOCK_CHANGE_SET else SnackBarChannelType.LOCK_CHANGE_FREE
+                                            if (isLock.value) SnackBarChannelObject.Type.LOCK_CHANGE_SET else SnackBarChannelObject.Type.LOCK_CHANGE_FREE
 
-                                        channel.trySend(snackbarChannelList.first {
-                                            it.channelType == snackBarChannelType
+                                        channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                            item.channelType == snackBarChannelType
                                         }.channel)
                                     }
 
@@ -638,10 +635,10 @@ fun DetailMemoView(navController: NavController, id:Long) {
                                         }
 
                                         val snackBarChannelType =
-                                            if (isMark.value) SnackBarChannelType.MARKER_CHANGE_SET else SnackBarChannelType.MARKER_CHANGE_FREE
+                                            if (isMark.value) SnackBarChannelObject.Type.MARKER_CHANGE_SET else SnackBarChannelObject.Type.MARKER_CHANGE_FREE
 
-                                        channel.trySend(snackbarChannelList.first {
-                                            it.channelType == snackBarChannelType
+                                        channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                            item.channelType == snackBarChannelType
                                         }.channel)
 
                                     }

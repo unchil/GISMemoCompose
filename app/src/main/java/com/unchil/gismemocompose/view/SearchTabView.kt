@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -32,11 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
-import com.unchil.gismemocompose.db.TagInfoDataObject
+import com.unchil.gismemocompose.model.TagInfoDataObject
 import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
-import com.unchil.gismemocompose.view.recognizerIntent
 import com.unchil.gismemocompose.viewmodel.ListViewModel
 import kotlinx.coroutines.launch
 

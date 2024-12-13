@@ -1,4 +1,4 @@
-package com.unchil.gismemocompose.db
+package com.unchil.gismemocompose.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalance

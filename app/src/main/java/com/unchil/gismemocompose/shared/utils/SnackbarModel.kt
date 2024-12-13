@@ -3,6 +3,7 @@ package com.unchil.gismemocompose.shared.utils
 import androidx.compose.material3.SnackbarDuration
 import com.unchil.gismemocompose.R
 
+/*
 enum class SnackBarChannelType {
     ALL_DATA_DELETE,
     BIOMETRIC_NO_SUCCESS,
@@ -193,3 +194,5 @@ val snackbarChannelList = listOf(
     ),
 
 )
+
+ */

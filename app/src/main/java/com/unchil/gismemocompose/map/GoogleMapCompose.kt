@@ -9,14 +9,55 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.material3.SheetValue.Hidden
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Api
+import androidx.compose.material.icons.outlined.BedtimeOff
+import androidx.compose.material.icons.outlined.CompassCalibration
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.LocationOff
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.ModeOfTravel
+import androidx.compose.material.icons.outlined.OpenWith
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -35,19 +76,6 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.size.Size
-import com.unchil.gismemocompose.LocalUsableDarkMode
-import com.unchil.gismemocompose.LocalUsableHaptic
-import com.unchil.gismemocompose.R
-import com.unchil.gismemocompose.data.RepositoryProvider
-import com.unchil.gismemocompose.db.LocalLuckMemoDB
-import com.unchil.gismemocompose.db.entity.MEMO_TBL
-import com.unchil.gismemocompose.model.BiometricCheckType
-import com.unchil.gismemocompose.navigation.GisMemoDestinations
-import com.unchil.gismemocompose.shared.composables.*
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
-import com.unchil.gismemocompose.ui.theme.GISMemoTheme
-import com.unchil.gismemocompose.viewmodel.MemoMapViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -56,9 +84,33 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerInfoWindowContent
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.widgets.ScaleBar
+import com.unchil.gismemocompose.LocalUsableDarkMode
+import com.unchil.gismemocompose.LocalUsableHaptic
+import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.db.entity.MEMO_TBL
+import com.unchil.gismemocompose.model.BiometricCheckType
+import com.unchil.gismemocompose.model.SnackBarChannelObject
+import com.unchil.gismemocompose.navigation.GisMemoDestinations
+import com.unchil.gismemocompose.shared.composables.CheckPermission
+import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
+import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
+import com.unchil.gismemocompose.shared.composables.PermissionsManager
+import com.unchil.gismemocompose.shared.composables.biometricPrompt
+import com.unchil.gismemocompose.ui.theme.GISMemoTheme
+import com.unchil.gismemocompose.viewmodel.MemoMapViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -387,10 +439,9 @@ fun MemoMapView(navController: NavController){
         val channel = remember { Channel<Int>(Channel.CONFLATED) }
         LaunchedEffect(channel) {
             channel.receiveAsFlow().collect { index ->
-                val channelData = snackbarChannelList.first {
-                    it.channel == index
+                val channelData = SnackBarChannelObject.entries.first { item ->
+                    item.channel == index
                 }
-
 
                 val result = snackbarHostState.showSnackbar(
                     message = context.resources.getString( channelData.message),
@@ -417,8 +468,8 @@ fun MemoMapView(navController: NavController){
         val checkEnableLocationService:()-> Unit = {
             fusedLocationProviderClient.lastLocation.addOnCompleteListener(context.mainExecutor) { task ->
                 if (!task.isSuccessful || task.result == null) {
-                    channel.trySend(snackbarChannelList.first {
-                        it.channelType == SnackBarChannelType.LOCATION_SERVICE_DISABLE
+                    channel.trySend(SnackBarChannelObject.entries.first {item ->
+                        item.channelType == SnackBarChannelObject.Type.LOCATION_SERVICE_DISABLE
                     }.channel)
                 }
             }

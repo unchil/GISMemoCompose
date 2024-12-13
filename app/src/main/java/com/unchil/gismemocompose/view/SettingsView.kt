@@ -69,10 +69,9 @@ import com.unchil.gismemocompose.LocalUsableDynamicColor
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
+import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.SettingsViewModel
 import kotlinx.coroutines.channels.Channel
@@ -199,8 +198,8 @@ fun SettingsView(navController: NavHostController){
 
     LaunchedEffect(channel) {
         channel.receiveAsFlow().collect { index ->
-            val channelData = snackbarChannelList.first {
-                it.channel == index
+            val channelData = SnackBarChannelObject.entries.first { item ->
+                item.channel == index
             }
 
             val result = snackBarHostState.showSnackbar(
@@ -399,8 +398,8 @@ fun SettingsView(navController: NavHostController){
                 DeleteConfirmDialog(isAlertDialog){
                     viewModel.onEvent(SettingsViewModel.Event.clearAllMemo)
 
-                    channel.trySend(snackbarChannelList.first {
-                        it.channelType == SnackBarChannelType.ALL_DATA_DELETE
+                    channel.trySend(SnackBarChannelObject.entries.first {item ->
+                        item.channelType == SnackBarChannelObject.Type.ALL_DATA_DELETE
                     }.channel)
                 }
 

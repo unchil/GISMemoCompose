@@ -56,7 +56,6 @@ import androidx.compose.material.icons.outlined.Swipe
 import androidx.compose.material.icons.outlined.Toll
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material.icons.rounded.Replay
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -99,7 +98,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -130,8 +128,9 @@ import com.unchil.gismemocompose.LocalUsableDarkMode
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
-import com.unchil.gismemocompose.db.TagInfoDataObject
+import com.unchil.gismemocompose.model.TagInfoDataObject
 import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
+import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.model.WriteMemoDataType
 import com.unchil.gismemocompose.navigation.GisMemoDestinations
 import com.unchil.gismemocompose.shared.ChkNetWork
@@ -142,8 +141,6 @@ import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.shared.utils.FileManager
-import com.unchil.gismemocompose.shared.utils.SnackBarChannelType
-import com.unchil.gismemocompose.shared.utils.snackbarChannelList
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import kotlinx.coroutines.channels.Channel
@@ -447,8 +444,8 @@ fun WriteMemoView(navController: NavController ){
         val channel = remember { Channel<Int>(Channel.CONFLATED) }
         LaunchedEffect(channel) {
             channel.receiveAsFlow().collect { index ->
-                val channelData = snackbarChannelList.first {
-                    it.channel == index
+                val channelData = SnackBarChannelObject.entries.first { item ->
+                    item.channel == index
                 }
 
 
@@ -462,7 +459,7 @@ fun WriteMemoView(navController: NavController ){
                     SnackbarResult.ActionPerformed -> {
                         hapticProcessing()
                         when (channelData.channelType) {
-                            SnackBarChannelType.MEMO_CLEAR_REQUEST -> {
+                            SnackBarChannelObject.Type.MEMO_CLEAR_REQUEST  -> {
 
                                 viewModel.onEvent(WriteMemoViewModel.Event.InitMemo)
                                 snapShotList.clear()
@@ -471,8 +468,8 @@ fun WriteMemoView(navController: NavController ){
                                 isMapClear = true
                                 selectedTagArray.value = arrayListOf()
 
-                                channel.trySend(snackbarChannelList.first {
-                                    it.channelType == SnackBarChannelType.MEMO_CLEAR_RESULT
+                                channel.trySend(SnackBarChannelObject.entries.first { item ->
+                                    item.channelType == SnackBarChannelObject.Type.MEMO_CLEAR_RESULT
                                 }.channel)
                             }
                             else -> {
@@ -569,8 +566,8 @@ fun WriteMemoView(navController: NavController ){
         val checkEnableLocationService:()-> Unit = {
             fusedLocationProviderClient.lastLocation.addOnCompleteListener(context.mainExecutor) { task ->
                 if (!task.isSuccessful || task.result == null) {
-                    channel.trySend(snackbarChannelList.first {
-                        it.channelType == SnackBarChannelType.LOCATION_SERVICE_DISABLE
+                    channel.trySend(SnackBarChannelObject.entries.first {item ->
+                        item.channelType == SnackBarChannelObject.Type.LOCATION_SERVICE_DISABLE
                     }.channel)
                 }
             }
@@ -606,8 +603,8 @@ fun WriteMemoView(navController: NavController ){
                 )
 
 
-            channel.trySend(snackbarChannelList.first {
-                it.channelType == SnackBarChannelType.MEMO_SAVE
+            channel.trySend(SnackBarChannelObject.entries.first { item ->
+                item.channelType == SnackBarChannelObject.Type.MEMO_SAVE
             }.channel)
 
 
@@ -701,9 +698,9 @@ fun WriteMemoView(navController: NavController ){
                                 viewModel.onEvent(WriteMemoViewModel.Event.SetSnapShot(snapShotList.toList()))
                                 isSnapShot = false
 
-                                if(!isDefaultSnapShot) {
-                                    channel.trySend(snackbarChannelList.first {
-                                        it.channelType == SnackBarChannelType.SNAPSHOT_RESULT
+                                if (!isDefaultSnapShot) {
+                                    channel.trySend(SnackBarChannelObject.entries.first { item ->
+                                        item.channelType == SnackBarChannelObject.Type.SNAPSHOT_RESULT
                                     }.channel)
                                 }
                             }
@@ -802,8 +799,8 @@ fun WriteMemoView(navController: NavController ){
                                     hapticProcessing()
                                     when (it) {
                                         SaveMenu.CLEAR -> {
-                                            channel.trySend(snackbarChannelList.first {
-                                                it.channelType == SnackBarChannelType.MEMO_CLEAR_REQUEST
+                                            channel.trySend(SnackBarChannelObject.entries.first {item ->
+                                                item.channelType == SnackBarChannelObject.Type.MEMO_CLEAR_REQUEST
                                             }.channel)
                                         }
                                         SaveMenu.SAVE -> {
