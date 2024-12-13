@@ -110,6 +110,6 @@
     <string name="setting_DeleteAlertDialog_Title">Delete All Notes</string>
     <string name="setting_DeleteAlertDialog_Confirm">Confirm</string>
     <string name="snackbar_13">All data has been deleted.</string>
-
+    <string name="image_load_empty">"The file does not exist."</string>
 
 </resources>

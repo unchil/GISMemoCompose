@@ -117,4 +117,6 @@
     <string name="permission_setting_title">"시스템 설정"</string>
     <string name="permission_setting_msg"> "App Info 에서 권한 설정을 해 주세요."</string>
 
+    <string name="image_load_empty">"파일이 존재하지 않습니다."</string>
+
 </resources>

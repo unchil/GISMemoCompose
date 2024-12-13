@@ -75,7 +75,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.size.Size
+import coil3.size.Size
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState

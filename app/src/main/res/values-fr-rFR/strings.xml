@@ -104,4 +104,7 @@
     <string name="setting_DeleteAlertDialog_Title">Supprimer toutes les notes</string>
     <string name="setting_DeleteAlertDialog_Confirm">Confirmer</string>
     <string name="snackbar_13">Toutes les données ont été supprimées.</string>
+
+    <string name="image_load_empty">"le fichier n'existe pas."</string>
+
 </resources>

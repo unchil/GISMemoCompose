@@ -100,4 +100,7 @@
     <string name="setting_DeleteAlertDialog_Title">Excluir todas as notas</string>
     <string name="setting_DeleteAlertDialog_Confirm">Confirme</string>
     <string name="snackbar_13">Todos os dados foram excluídos.</string>
+
+    <string name="image_load_empty">"O arquivo não existe."</string>
+
 </resources>

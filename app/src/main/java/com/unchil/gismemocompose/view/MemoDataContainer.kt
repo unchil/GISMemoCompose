@@ -45,7 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.size.Size
+import coil3.size.Size
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.model.MemoData

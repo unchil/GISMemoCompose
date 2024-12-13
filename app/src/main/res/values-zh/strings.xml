@@ -111,5 +111,6 @@
     <string name="setting_DeleteAlertDialog_Confirm">确认</string>
     <string name="snackbar_13">所有数据已被删除。</string>
 
+    <string name="image_load_empty">"文件不存在"</string>
 
 </resources>

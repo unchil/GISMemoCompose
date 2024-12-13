@@ -15,13 +15,17 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.size.Size
+import coil3.SingletonImageLoader
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 
 
 import com.unchil.gismemocompose.R
@@ -29,83 +33,181 @@ import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 
+import coil3.size.Size
+
+
+
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun ImageViewer(data:Any, size: Size, isZoomable:Boolean = false){
+fun ImageViewer(
+    data:Any,
+    size: Size,
+    contentScale: ContentScale = ContentScale.FillWidth,
+    isZoomable:Boolean = false
+){
 
-    val scale = remember { mutableStateOf(1f) }
-    val rotationState = remember { mutableStateOf(0f) }
+    val context = LocalContext.current
+    var scale = 1f
+    var rotationState = 0f
 
-    val boxModifier:Modifier = when(isZoomable) {
+    val boxModifier:Modifier = remember {
+        when (isZoomable) {
             true -> {
-                Modifier.fillMaxSize().pointerInput(Unit){
-                    detectTransformGestures { centroid, pan, zoom, rotation ->
-                        scale.value *= zoom
-                        rotationState.value += rotation }}
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, _, zoom, rotation ->
+                            scale *= zoom
+                            rotationState += rotation
+                        }
+                    }
             }
+
             false -> Modifier.fillMaxSize()
         }
-
-    val imageModifier:Modifier  = when(isZoomable) {
-        true -> {
-            Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    // adding some zoom limits (min 50%, max 200%)
-                    scaleX = maxOf(.5f, minOf(3f, scale.value)),
-                    scaleY = maxOf(.5f, minOf(3f, scale.value)),
-                    rotationZ = rotationState.value
-                )
-        }
-        false -> Modifier.fillMaxSize()
     }
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = boxModifier
+    val imageModifier:Modifier = remember {
+        when (isZoomable) {
+            true -> {
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = maxOf(.5f, minOf(3f, scale)),
+                        scaleY = maxOf(.5f, minOf(3f, scale)),
+                        rotationZ = rotationState
+                    )
+            }
 
-        ){
-            val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(data)
-                    .size(size)
-                    .crossfade(true)
-                    .build()
-            )
+            false -> Modifier.fillMaxSize()
+        }
+    }
 
-            when(painter.state){
+    val model =
+        ImageRequest.Builder(context).data(data).size(size).crossfade(true).build()
 
-                is AsyncImagePainter.State.Loading -> {
 
-                    CircularProgressIndicator(
+    val transform: (AsyncImagePainter.State) -> AsyncImagePainter.State = {
+        when(it){
+            is AsyncImagePainter.State.Error -> {
+                if(data == ""){
+                    AsyncImagePainter.State.Empty
+                }else {
+                    it
+                }
+            }
+            else -> { it}
+        }
+    }
+
+
+
+
+    SubcomposeAsyncImage(
+        model = model,
+        contentDescription = "" ,
+        imageLoader = SingletonImageLoader.get(context),
+        transform = transform
+    ) {
+
+        val painter = this.painter
+        val state by painter.state.collectAsState()
+
+        when(state){
+            is AsyncImagePainter.State.Loading -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = boxModifier
+                ){
+                    androidx.compose.material.CircularProgressIndicator(
                         color = Color.Gray,
                         modifier = Modifier.align(Alignment.Center)
                     )
-
-
-                }
-                is AsyncImagePainter.State.Success  -> {
-
-                    Image(
-
-                        painter = painter,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = imageModifier
-
-                    )
-                }
-                is AsyncImagePainter.State.Empty -> {
-
-                }
-                is AsyncImagePainter.State.Error -> {
-
                 }
             }
+            is AsyncImagePainter.State.Success -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = boxModifier
+                ){
+                    Image(
+                        painter = painter ,
+                        contentDescription = "",
+                        contentScale = contentScale,
+                        modifier = imageModifier
+                    )
+                }
+            }
+            AsyncImagePainter.State.Empty -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = boxModifier.padding(10.dp)
+                ){
+/*
+                    Image(
+                        painterResource(R.drawable.outline_perm_media_black_48),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = imageModifier
+                    )
+
+                    androidx.compose.material.Text(
+                        text = context.getString(R.string.image_load_empty),
+                        color = Color.Yellow,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .background(color = Color.DarkGray.copy(alpha = 0.8f))
+                            .padding(10.dp)
+                        ,
+                        textAlign= TextAlign.Center,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+ */
+
+                }
+
+            }
+            is AsyncImagePainter.State.Error -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = boxModifier.padding(10.dp)
+                ){
+                    Image(
+                        painterResource(R.drawable.outline_perm_media_black_48),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = imageModifier
+                    )
+
+                    (painter.state as AsyncImagePainter.State.Error).result.throwable.localizedMessage?.let {
+                        androidx.compose.material.Text(
+                            text =it,
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .background(color = Color.DarkGray.copy(alpha = 0.8f))
+                                .padding(10.dp)
+                            ,
+                            textAlign= TextAlign.Center,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+
+            }
+
         }
 
+    }
+
+
 }
+
+
 
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -97,4 +97,6 @@
     <string name="setting_UsableDynamicColor">Modo de color dinámico</string>
     <string name="setting_DeleteAlertDialog_Title">Supprimer toutes les notes</string>
     <string name="setting_DeleteAlertDialog_Confirm">Confirmar</string>
+
+    <string name="image_load_empty">"El archivo no existe."</string>
 </resources>

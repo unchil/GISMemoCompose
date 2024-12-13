@@ -1,5 +1,6 @@
 package com.unchil.gismemocompose.api
 
+/*
 import coil.intercept.Interceptor
 import coil.request.ImageResult
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -35,3 +36,5 @@ object UnsplashSizingInterceptor : Interceptor {
 
     }
 }
+
+ */

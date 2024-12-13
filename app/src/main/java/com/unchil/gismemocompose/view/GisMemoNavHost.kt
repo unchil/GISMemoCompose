@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import coil.size.Size
+import coil3.size.Size
 import com.unchil.gismemocompose.navigation.GisMemoDestinations
 
 

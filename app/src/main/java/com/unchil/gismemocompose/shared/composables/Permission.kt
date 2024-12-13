@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import coil.size.Size
+import coil3.size.Size
 import com.unchil.gismemocompose.model.BiometricCheckType
 import com.unchil.gismemocompose.model.getTitle
 import com.unchil.gismemocompose.view.ImageViewer
