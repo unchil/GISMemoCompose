@@ -88,6 +88,8 @@ import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.model.TagInfoDataObject
 import com.unchil.gismemocompose.db.entity.toCURRENTWEATHER_TBL
+import com.unchil.gismemocompose.model.MapTypeMenuData
+import com.unchil.gismemocompose.model.SettingMenuData
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
@@ -163,8 +165,8 @@ fun DetailMemoView(navController: NavController, id:Long) {
         var mapProperties by remember {
             mutableStateOf(
                 MapProperties(
-                    mapType =    MapType.values().first { mapType ->
-                        mapType.name == MapTypeMenuList[mapTypeIndex].name
+                    mapType =    MapType.entries.first { item ->
+                        item.name == MapTypeMenuData.Types[mapTypeIndex].name
                     },
                     isMyLocationEnabled = true,
                     mapStyleOptions = if(isDarkMode) {
@@ -173,6 +175,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                             R.raw.mapstyle_night
                         )
                     } else { null }
+
                 )
             )
         }
@@ -547,24 +550,24 @@ fun DetailMemoView(navController: NavController, id:Long) {
                         shape = ShapeDefaults.ExtraSmall
                     )
             ) {
-                MapTypeMenuList.forEachIndexed { index, it ->
+                MapTypeMenuData.Types.forEachIndexed { index, mapType ->
                     AnimatedVisibility(
                         visible = isVisibleMenu.value,
                     ) {
                         IconButton(
                             onClick = {
                                 hapticProcessing()
-                                val mapType = MapType.values().first { mapType ->
-                                    mapType.name == it.name
+                                val findType = MapType.entries.first { item ->
+                                    mapType.name == item.name
                                 }
-                                mapProperties = mapProperties.copy(mapType = mapType)
+                                mapProperties = mapProperties.copy(mapType = findType)
                                 mapTypeIndex = index
 
                             }) {
 
                             Icon(
-                                imageVector = it.getDesc().first,
-                                contentDescription = it.name,
+                                imageVector = MapTypeMenuData.desc(mapType).first,
+                                contentDescription = mapType.name,
                             )
                         }
                     }
@@ -596,15 +599,15 @@ fun DetailMemoView(navController: NavController, id:Long) {
                     )
                 }
 
-                SettingMenuList.forEach {
+                SettingMenuData.Types.forEach { menuType ->
                     AnimatedVisibility(
                         visible = isVisibleMenu.value,
                     ) {
                         IconButton(
                             onClick = {
                                 hapticProcessing()
-                                when (it) {
-                                    SettingMenu.SECRET -> {
+                                when (menuType) {
+                                    SettingMenuData.Type.SECRET -> {
                                         isLock.value = !isLock.value
                                         memo.value?.let {
                                             viewModel.onEvent(
@@ -623,7 +626,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                                         }.channel)
                                     }
 
-                                    SettingMenu.MARKER -> {
+                                    SettingMenuData.Type.MARKER -> {
                                         isMark.value = !isMark.value
                                         memo.value?.let {
                                             viewModel.onEvent(
@@ -642,7 +645,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                                         }.channel)
 
                                     }
-                                    SettingMenu.TAG -> {
+                                    SettingMenuData.Type.TAG -> {
                                         isTagDialog = !isTagDialog
                                         if(!isTagDialog){
                                             tagDialogDissmissHandler.invoke()
@@ -651,24 +654,28 @@ fun DetailMemoView(navController: NavController, id:Long) {
 
                                 }
                             }) {
-                            val icon = when (it) {
-                                SettingMenu.SECRET -> {
-                                    if (isLock.value) it.getDesc().first else it.getDesc().second
-                                        ?: it.getDesc().first
+                            val icon = when (menuType) {
+                                SettingMenuData.Type.SECRET -> {
+                                    if (isLock.value)
+                                        SettingMenuData.desc(menuType).first
+                                    else
+                                        SettingMenuData.desc(menuType).second
+                                            ?:SettingMenuData.desc(menuType).first
                                 }
-                                SettingMenu.MARKER -> {
-                                    if (isMark.value) it.getDesc().first else it.getDesc().second
-                                        ?: it.getDesc().first
+                                SettingMenuData.Type.MARKER -> {
+                                    if (isMark.value) SettingMenuData.desc(menuType).first
+                                    else SettingMenuData.desc(menuType).second
+                                        ?: SettingMenuData.desc(menuType).first
                                 }
                                 else -> {
-                                    it.getDesc().first
+                                    SettingMenuData.desc(menuType).first
                                 }
 
                             }
 
                             Icon(
                                 imageVector = icon,
-                                contentDescription = it.name,
+                                contentDescription = menuType.name,
                             )
                         }
                     }

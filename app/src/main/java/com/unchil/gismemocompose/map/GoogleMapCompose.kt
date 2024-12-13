@@ -101,6 +101,7 @@ import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
 import com.unchil.gismemocompose.model.BiometricCheckType
+import com.unchil.gismemocompose.model.MapTypeMenuData
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.navigation.GisMemoDestinations
 import com.unchil.gismemocompose.shared.composables.CheckPermission
@@ -489,16 +490,10 @@ fun MemoMapView(navController: NavController){
         var mapProperties by remember {
             mutableStateOf(
                 MapProperties(
-                    mapType =    MapType.values().first { mapType ->
-                        mapType.name == MapTypeMenuList[mapTypeIndex].name
-                    },
+                    isBuildingEnabled =true,
                     isMyLocationEnabled = true,
-                    mapStyleOptions = if(isDarkMode) {
-                        MapStyleOptions.loadRawResourceStyle(
-                            context,
-                            R.raw.mapstyle_night
-                        )
-                    } else { null }
+                    mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.mapstyle_night),
+                    mapType = MapType.NORMAL
                 )
             )
         }
@@ -506,8 +501,12 @@ fun MemoMapView(navController: NavController){
     val uiSettings by remember {
         mutableStateOf(
             MapUiSettings(
+                compassEnabled = true,
+                myLocationButtonEnabled = true,
+                mapToolbarEnabled = true,
                 zoomControlsEnabled = false
-                )
+
+            )
         )
     }
 
@@ -773,23 +772,25 @@ fun MemoMapView(navController: NavController){
 
                     ) {
 
-                        MapTypeMenuList.forEachIndexed { index, it ->
+                        MapTypeMenuData.Types.forEachIndexed { index, menuType ->
                             AnimatedVisibility(
                                 visible = isVisibleMenu.value,
                             ) {
                                IconButton(onClick = {
                                     hapticProcessing()
-                                    val mapType = MapType.values().first { mapType ->
-                                        mapType.name == it.name
-                                    }
-                                    mapProperties = mapProperties.copy(mapType = mapType)
+                                   val findType = MapType.entries.first { item ->
+                                       item.name == menuType.name
+                                   }
+                                   mapProperties = mapProperties.copy(mapType = findType)
                                    mapTypeIndex = index
 
-                                }) {
+
+
+                               }) {
 
                                     Icon(
-                                        imageVector = it.getDesc().first,
-                                        contentDescription = it.name,
+                                        imageVector = MapTypeMenuData.desc(menuType).first,
+                                        contentDescription = menuType.name,
                                     )
                                 }
                             }
