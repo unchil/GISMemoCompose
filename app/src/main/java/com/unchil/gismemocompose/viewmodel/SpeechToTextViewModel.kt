@@ -10,9 +10,12 @@ import kotlinx.coroutines.launch
 class SpeechToTextViewModel (  val repository: Repository ) : ViewModel(){
 
 
+    var _currentAudioText: MutableList<Pair<String, List<String>>> = mutableListOf()
 
-    val _currentAudioText: StateFlow<List<Pair<String, List<Uri>>>>
-            = repository.currentAudioText
+    init {
+        _currentAudioText = repository.currentAudioText.value.toMutableList()
+    }
+
 
     fun onEvent(event: Event){
         when(event){
@@ -23,15 +26,15 @@ class SpeechToTextViewModel (  val repository: Repository ) : ViewModel(){
         }
     }
 
-    private fun setAudioText(data: List<Pair<String, List<Uri>>>){
+    private fun setAudioText(data: List<Pair<String, List<String>>>){
         viewModelScope.launch {
-            repository.currentAudioText.emit(data)
+            repository.setAudioText(data)
         }
     }
 
 
     sealed class Event {
-        data class SetAudioText(val data: List<Pair<String,  List<Uri>>>): Event()
+        data class SetAudioText(val data: List<Pair<String,  List<String>>>): Event()
 
     }
 

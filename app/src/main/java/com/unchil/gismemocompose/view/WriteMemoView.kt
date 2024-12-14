@@ -120,7 +120,8 @@ import com.unchil.gismemocompose.model.SaveMenuData
 import com.unchil.gismemocompose.model.SettingMenuData
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.model.TagInfoDataObject
-import com.unchil.gismemocompose.model.WriteMemoDataType
+import com.unchil.gismemocompose.model.WriteMemoData
+
 import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
 import com.unchil.gismemocompose.shared.composables.CheckPermission
@@ -263,7 +264,7 @@ fun WriteMemoView(navController: NavController ){
         val polylineListR: MutableList<DrawingPolyline> = rememberSaveable { mutableListOf() }
         var polylineList: SnapshotStateList<List<LatLng>>  =  polylineListR.toMutableStateList()
 
-        val snapShotList: MutableList<Uri> = rememberSaveable { mutableListOf() }
+        val snapShotList: MutableList<String> = rememberSaveable { mutableListOf() }
 
         var alignmentSaveMenuList: Alignment   by remember {  mutableStateOf (Alignment.TopCenter)}
         var alignmentMyLocation: Alignment   by remember {  mutableStateOf ( Alignment.TopStart)}
@@ -439,10 +440,10 @@ fun WriteMemoView(navController: NavController ){
 
         val saveHandler: (title: String) -> Unit = { title ->
             val desc = String.format( context.resources.getString(R.string.memo_desc),
-                viewModel.snapShotList.value.size,
-                viewModel.audioTextList.value.size,
-                viewModel.phothoList.value.size,
-                viewModel.videoList.value.size
+                viewModel.snapShotListStateFlow.value.size,
+                viewModel.audioTextStateFlow.value.size,
+                viewModel.photoListStateFlow.value.size,
+                viewModel.videoListStateFlow.value.size
             )
 
             var snippets = ""
@@ -558,7 +559,7 @@ fun WriteMemoView(navController: NavController ){
                                     100,
                                     FileOutputStream(filePath)
                                 )
-                                snapShotList.add(filePath.toUri())
+                                snapShotList.add(filePath)
                                 viewModel.onEvent(WriteMemoViewModel.Event.SetSnapShot(snapShotList.toList()))
                                 isSnapShot = false
 
@@ -1059,7 +1060,7 @@ fun WriteMemoView(navController: NavController ){
                         cancelSnapShot = {
                             if(isDefaultSnapShot) {
                                 viewModel.onEvent(
-                                    WriteMemoViewModel.Event.DeleteMemoItem( WriteMemoDataType.SNAPSHOT, 0)
+                                    WriteMemoViewModel.Event.DeleteMemoItem( WriteMemoData.Type.SNAPSHOT, 0)
                                 )
                                 snapShotList.clear()
                                 isDefaultSnapShot = false

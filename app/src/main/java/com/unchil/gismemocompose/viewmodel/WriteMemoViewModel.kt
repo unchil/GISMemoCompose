@@ -6,21 +6,73 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
-import com.unchil.gismemocompose.model.WriteMemoDataType
-import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
+import com.google.android.gms.maps.model.LatLng
+import com.unchil.gismemocompose.model.WriteMemoData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
 
 class WriteMemoViewModel (
     val repository: Repository
 ) : ViewModel() {
 
-    val  phothoList: StateFlow<List<Uri>> = repository.currentPhoto
-    val videoList: StateFlow<List<Uri>> =  repository.currentVideo
-    val audioTextList: StateFlow<List<Pair<String, List<Uri>>>> =  repository.currentAudioText
-    val snapShotList: StateFlow<List<Uri>> = repository.currentSnapShot
+    private val _photoListStateFlow: MutableStateFlow<List<String>>
+            = MutableStateFlow(emptyList())
 
+    val photoListStateFlow: StateFlow<List<String>>
+            = _photoListStateFlow.asStateFlow()
+
+
+    private val _videoListStateFlow: MutableStateFlow<List<String>>
+            = MutableStateFlow(emptyList())
+
+    val videoListStateFlow:  StateFlow<List<String>>
+            = _videoListStateFlow.asStateFlow()
+
+    private val _audioTextStateFlow: MutableStateFlow<List<Pair<String, List<String>>>>
+            = MutableStateFlow(emptyList())
+
+    val audioTextStateFlow: StateFlow<List<Pair<String, List<String>>>>
+            = _audioTextStateFlow.asStateFlow()
+
+
+    private val  _snapShotListStateFlow: MutableStateFlow<List<String>>
+            = MutableStateFlow(emptyList())
+
+    val snapShotListStateFlow:  StateFlow<List<String>>
+            = _snapShotListStateFlow.asStateFlow()
+
+    init {
+
+        viewModelScope.launch {
+            repository.currentVideo.collectLatest { it ->
+                _videoListStateFlow.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.currentAudioText.collectLatest { it ->
+                _audioTextStateFlow.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.currentPhoto.collectLatest { it ->
+                _photoListStateFlow.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.currentSnapShot.collectLatest {
+                _snapShotListStateFlow.value = it
+            }
+
+        }
+
+    }
         fun onEvent(event: Event){
             when(event){
 
@@ -103,7 +155,7 @@ class WriteMemoViewModel (
         }
     }
 
-    private fun deleteMemoItem( type:WriteMemoDataType,  index:Int) {
+    private fun deleteMemoItem( type:WriteMemoData.Type,  index:Int) {
         viewModelScope.launch {
             repository.deleteMemoItem(type, index)
         }
@@ -140,28 +192,18 @@ class WriteMemoViewModel (
     }
 
 
-
-    private fun setSelectedTab(selectedTab: WriteMemoDataType){
-        viewModelScope.launch {
-            repository.currentSelectedTab.emit(selectedTab)
-        }
+    private fun setSnapShot(snapShotList:  List<String>){
+        repository.setSnapShot(snapShotList)
+        repository.setSelectedTab(WriteMemoData.Type.SNAPSHOT)
     }
 
 
 
-    private fun setSnapShot(snapShotList:  List<Uri>){
-        viewModelScope.launch {
-            repository.currentSnapShot.emit(snapShotList)
-            setSelectedTab(WriteMemoDataType.SNAPSHOT)
-        }
-    }
-
-
-        sealed class Event {
-            data class SetSnapShot(val snapShotList: List<Uri>): Event()
+    sealed class Event {
+            data class SetSnapShot(val snapShotList: List<String>): Event()
             data class ToRoute(val navController: NavController, val route:String) : Event()
 
-            data class DeleteMemoItem(val type:WriteMemoDataType, val index:Int): Event()
+            data class DeleteMemoItem(val type:WriteMemoData.Type, val index:Int): Event()
 
             data class UpdateIsDrawing(val isDrawing:Boolean): Event()
             data class UpdateIsEraser(val isEraser:Boolean): Event()

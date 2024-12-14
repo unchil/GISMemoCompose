@@ -11,14 +11,14 @@ import kotlinx.coroutines.launch
 
 class CameraViewModel  ( val repository: Repository) : ViewModel(){
 
+    var _currentPhoto: MutableList<String> = mutableListOf()
+    var _currentVideo: MutableList<String> = mutableListOf()
 
+    init {
+        _currentPhoto  = repository.currentPhoto.value.toMutableList()
+        _currentVideo = repository.currentVideo.value.toMutableList()
+    }
 
-    var _currentPhoto: StateFlow<List<Uri>>
-            = repository.currentPhoto
-
-
-    var _currentVideo:  StateFlow<List<Uri>>
-            = repository.currentVideo
 
     fun onEvent(event: Event){
             when(event){
@@ -28,34 +28,14 @@ class CameraViewModel  ( val repository: Repository) : ViewModel(){
             }
     }
 
-    private fun setPhotoVideo(photoList:List<Uri>, videoList:List<Uri>){
+    private fun setPhotoVideo(photoList:List<String>, videoList:List<String>){
         viewModelScope.launch {
-
-            repository.currentPhoto.emit(photoList)
-            repository.currentVideo.emit(videoList)
-
-             /*
-
-            val newCurrentPhoto = repository.currentPhoto.value.toMutableList()
-            photoList.forEach {
-                newCurrentPhoto.add(it)
-            }
-
-            val newCurrentVideo = repository.currentVideo.value.toMutableList()
-            videoList.forEach {
-                newCurrentVideo.add(it)
-            }
-
-            repository.currentPhoto.emit(newCurrentPhoto)
-            repository.currentVideo.emit(newCurrentVideo)
-
-              */
-
+            repository.setPhotoVideo(photoList, videoList)
         }
     }
 
     sealed class Event {
-        data class SetPhotoVideo(val photoList:List<Uri>, val videoList:List<Uri>): Event()
+        data class SetPhotoVideo(val photoList:List<String>, val videoList:List<String>): Event()
     }
 
     private val _effect = MutableSharedFlow<Effect>()

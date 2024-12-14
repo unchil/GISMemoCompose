@@ -13,8 +13,7 @@ import com.unchil.gismemocompose.api.RetrofitAdapter
 import com.unchil.gismemocompose.db.CURRENTWEATHER_TBL
 import com.unchil.gismemocompose.db.LuckMemoDB
 import com.unchil.gismemocompose.db.entity.*
-import com.unchil.gismemocompose.model.WriteMemoDataType
-import com.unchil.gismemocompose.model.WriteMemoDataTypeList
+import com.unchil.gismemocompose.model.WriteMemoData
 import com.unchil.gismemocompose.model.toCURRENTWEATHER_TBL
 import com.unchil.gismemocompose.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +34,7 @@ class Repository{
     lateinit var database:LuckMemoDB
 
 
-    val currentSelectedTab:MutableStateFlow<WriteMemoDataType?>
+    val currentSelectedTab:MutableStateFlow<WriteMemoData.Type?>
         = MutableStateFlow(null)
 
     val selectedMemo:MutableStateFlow<MEMO_TBL?> = MutableStateFlow(null)
@@ -153,28 +152,46 @@ class Repository{
     }
 
 //------
-    val currentAudioText: MutableStateFlow<List<Pair<String, List<Uri>>>>
+    val currentAudioText: MutableStateFlow<List<Pair<String, List<String>>>>
             = MutableStateFlow( listOf())
 
-    val currentPhoto:  MutableStateFlow<List<Uri>>
+    fun setAudioText(audioTextList: List<Pair<String, List<String>>>){
+        currentAudioText.value = audioTextList
+    }
+
+    fun setPhotoVideo(photoList:List<String>, videoList:List<String>){
+        currentPhoto.value = photoList
+        currentVideo.value = videoList
+    }
+
+    fun setSnapShot(data:List<String> ){
+        currentSnapShot.value = data
+    }
+
+    fun setSelectedTab(data: WriteMemoData.Type){
+        currentSelectedTab.value = data
+    }
+
+
+    val currentPhoto:  MutableStateFlow<List<String>>
     = MutableStateFlow( listOf())
 
-    val currentVideo: MutableStateFlow<List<Uri>>
+    val currentVideo: MutableStateFlow<List<String>>
             = MutableStateFlow( listOf())
 
-    val currentSnapShot: MutableStateFlow<List<Uri>>
+    val currentSnapShot: MutableStateFlow<List<String>>
             = MutableStateFlow( listOf())
 
-    val detailAudioText: MutableStateFlow<List<Pair<String, List<Uri>>>>
+    val detailAudioText: MutableStateFlow<List<Pair<String, List<String>>>>
             = MutableStateFlow( listOf())
 
-    val detailPhoto:  MutableStateFlow<List<Uri>>
+    val detailPhoto:  MutableStateFlow<List<String>>
             = MutableStateFlow( listOf())
 
-    val detailVideo: MutableStateFlow<List<Uri>>
+    val detailVideo: MutableStateFlow<List<String>>
             = MutableStateFlow( listOf())
 
-    val detailSnapShot: MutableStateFlow<List<Uri>>
+    val detailSnapShot: MutableStateFlow<List<String>>
             = MutableStateFlow( listOf())
 
 
@@ -185,24 +202,24 @@ class Repository{
 
     val _currentWeather:MutableStateFlow<CURRENTWEATHER_TBL?>  = MutableStateFlow(null)
 
-    suspend fun deleteMemoItem( type:WriteMemoDataType,  index:Int) {
+    suspend fun deleteMemoItem( type:WriteMemoData.Type,  index:Int) {
         when(type){
-            WriteMemoDataType.PHOTO -> {
+            WriteMemoData.Type.PHOTO -> {
                 val newMemoItem = currentPhoto.value.toMutableList()
                 newMemoItem.removeAt(index)
                 currentPhoto.emit(newMemoItem)
             }
-            WriteMemoDataType.AUDIOTEXT -> {
+            WriteMemoData.Type.AUDIOTEXT -> {
                 val newMemoItem = currentAudioText.value.toMutableList()
                 newMemoItem.removeAt(index)
                 currentAudioText.emit(newMemoItem)
             }
-            WriteMemoDataType.VIDEO -> {
+            WriteMemoData.Type.VIDEO -> {
                 val newMemoItem = currentVideo.value.toMutableList()
                 newMemoItem.removeAt(index)
                 currentVideo.emit(newMemoItem)
             }
-            WriteMemoDataType.SNAPSHOT -> {
+            WriteMemoData.Type.SNAPSHOT -> {
                 val newMemoItem = currentSnapShot.value.toMutableList()
                 newMemoItem.removeAt(index)
                 currentSnapShot.emit(newMemoItem)
@@ -214,26 +231,26 @@ class Repository{
 
     suspend fun initMemoItem(){
 
-        WriteMemoDataTypeList.forEach {
+        WriteMemoData.Types.forEach {
 
             when(it){
-                WriteMemoDataType.PHOTO -> {
+                WriteMemoData.Type.PHOTO -> {
                     val newMemoItem = currentPhoto.value.toMutableList()
                     newMemoItem.clear()
                     currentPhoto.emit(newMemoItem)
                 }
 
-                WriteMemoDataType.AUDIOTEXT -> {
+                WriteMemoData.Type.AUDIOTEXT -> {
                     val newMemoItem = currentAudioText.value.toMutableList()
                     newMemoItem.clear()
                     currentAudioText.emit(newMemoItem)
                 }
-                WriteMemoDataType.VIDEO -> {
+                WriteMemoData.Type.VIDEO -> {
                     val newMemoItem = currentVideo.value.toMutableList()
                     newMemoItem.clear()
                     currentVideo.emit(newMemoItem)
                 }
-                WriteMemoDataType.SNAPSHOT -> {
+                WriteMemoData.Type.SNAPSHOT -> {
                     val newMemoItem = currentSnapShot.value.toMutableList()
                     newMemoItem.clear()
                     currentSnapShot.emit(newMemoItem)
@@ -265,7 +282,7 @@ class Repository{
 
  */
 
-        val snapshot = currentSnapShot.value.first().encodedPath ?: ""
+        val snapshot = currentSnapShot.value.first()
         val memoTbl = MEMO_TBL(
             id = id,
             latitude = location.latitude,
@@ -290,10 +307,10 @@ class Repository{
             memoFileTblList.add(
                 MEMO_FILE_TBL(
                     id = id,
-                    type = WriteMemoDataType.SNAPSHOT.name,
+                    type = WriteMemoData.Type.SNAPSHOT.name,
                     index = index,
                     subIndex = 0,
-                    filePath = uri.encodedPath ?: ""
+                    filePath = uri
                 )
             )
         }
@@ -302,10 +319,10 @@ class Repository{
             memoFileTblList.add(
                 MEMO_FILE_TBL(
                     id = id,
-                    type = WriteMemoDataType.PHOTO.name,
+                    type = WriteMemoData.Type.PHOTO.name,
                     index = index,
                     subIndex = 0,
-                    filePath = uri.encodedPath ?: ""
+                    filePath = uri
                 )
             )
         }
@@ -314,10 +331,10 @@ class Repository{
             memoFileTblList.add(
                 MEMO_FILE_TBL(
                     id = id,
-                    type = WriteMemoDataType.VIDEO.name,
+                    type = WriteMemoData.Type.VIDEO.name,
                     index = index,
                     subIndex = 0,
-                    filePath = uri.encodedPath ?: ""
+                    filePath = uri
                 )
             )
         }
@@ -336,10 +353,10 @@ class Repository{
                 memoFileTblList.add(
                     MEMO_FILE_TBL(
                         id = id,
-                        type = WriteMemoDataType.AUDIOTEXT.name,
+                        type = WriteMemoData.Type.AUDIOTEXT.name,
                         index = index,
                         subIndex = subIndex,
-                        filePath = uri.encodedPath ?: ""
+                        filePath = uri
                     )
                 )
             }
@@ -432,9 +449,9 @@ class Repository{
     }
 
     suspend fun setFiles(id:Long){
-
-
+        /*
         database.memoFileDao.select_Flow(id).collectLatest {
+
             val currentSnapShotList = it.filter { it.type ==  WriteMemoDataType.SNAPSHOT.name}.map { it.filePath.toUri() }.sorted()
             detailSnapShot.emit( currentSnapShotList )
 
@@ -458,6 +475,63 @@ class Repository{
                             }.map {
                                 it.filePath.toUri()
                             }.sorted()
+                        )
+                    )
+                }
+                detailAudioText.value = audiTextList
+            }
+
+        }
+
+         */
+
+        database.memoFileDao.memoFileListFlow(id).collectLatest { it ->
+            val currentSnapShotList = it.filter {
+                it.type ==  WriteMemoData.Type.SNAPSHOT.name
+            }.sortedBy {
+                it.index
+            }.map {
+                it.filePath
+            }
+
+            detailSnapShot.emit( currentSnapShotList )
+
+            val currentPhotoList = it.filter {
+                it.type ==  WriteMemoData.Type.PHOTO.name
+            }.sortedBy {
+                it.index
+            }.map {
+                it.filePath
+            }
+
+            detailPhoto.emit(  currentPhotoList )
+
+            val currentVideoList = it.filter {
+                it.type == WriteMemoData.Type.VIDEO.name
+            }.sortedBy {
+                it.index
+            }.map {
+                it.filePath
+            }
+
+            detailVideo.emit(  currentVideoList  )
+
+            database.memoTextDao.memoTextListFlow(id).collectLatest {memoTextTblList ->
+
+                val audiTextList = mutableListOf<Pair<String,List<String>>>()
+                val audioTextFileList = it.filter { it.type ==  WriteMemoData.Type.AUDIOTEXT.name}
+
+                memoTextTblList.forEach {commentList ->
+                    audiTextList.add(
+                        Pair(
+                            commentList.comment,
+                            audioTextFileList.filter {
+                                it.index == commentList.index
+                            }.sortedBy {
+                                it.subIndex
+                            }.map {
+                                it.filePath
+                            }
                         )
                     )
                 }

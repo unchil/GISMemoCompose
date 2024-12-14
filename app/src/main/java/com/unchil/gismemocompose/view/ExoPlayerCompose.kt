@@ -43,8 +43,8 @@ fun Context.getExoPlayer(exoPlayerListener: Player.Listener): ExoPlayer {
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 fun  ExoplayerCompose(
-    uri:Uri? = null,
-    uriList: List<Uri> = emptyList(),
+    uri:String? = null,
+    uriList: List<String> = emptyList(),
     isVisibleAmplitudes:Boolean = false,
     setTrackIndex:((ExoPlayer)->Unit)? = null ,
     trackInfo:((Int)->Unit)? = null ){
@@ -196,9 +196,9 @@ fun  ExoplayerCompose(
 @Composable
 private fun PrevExoplayerCompose(){
 
-        val uriList = listOf<Uri>(
-            "/data/data/com.example.gismemo/files/videos/2023-08-23-09-56-21-341.mp4".toUri(),
-            "/data/data/com.example.gismemo/files/videos/2023-08-23-09-56-37-675.mp4".toUri()
+        val uriList = listOf<String>(
+            "/data/data/com.example.gismemo/files/videos/2023-08-23-09-56-21-341.mp4",
+            "/data/data/com.example.gismemo/files/videos/2023-08-23-09-56-37-675.mp4"
         )
 
     GISMemoTheme {

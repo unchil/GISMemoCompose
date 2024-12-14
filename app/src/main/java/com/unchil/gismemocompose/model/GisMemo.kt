@@ -150,10 +150,10 @@ object CreateMenuData {
 
 
 sealed class MemoData {
-    data class Photo(val dataList: MutableList<Uri>) : MemoData()
-    data class SnapShot(val dataList: MutableList<Uri>) : MemoData()
-    data class AudioText(var dataList: MutableList<Pair<String,List<Uri>>>) : MemoData()
-    data class Video(val dataList: MutableList<Uri>) : MemoData()
+    data class Photo(val dataList: MutableList<String>) : MemoData()
+    data class SnapShot(val dataList: MutableList<String>) : MemoData()
+    data class AudioText(var dataList: MutableList<Pair<String,List<String>>>) : MemoData()
+    data class Video(val dataList: MutableList<String>) : MemoData()
 
 }
 
@@ -192,33 +192,40 @@ fun BiometricCheckType.getTitle(getString: (Int)->String):Pair<String,String> {
 
 }
 
-enum class MemoDataContainerUser {
+enum class MemoDataUser {
     DetailMemoView, WriteMemoView
 }
-enum class WriteMemoDataType {
-    PHOTO,AUDIOTEXT,VIDEO,SNAPSHOT
+
+object WriteMemoData {
+    enum class Type {
+        PHOTO,AUDIOTEXT,VIDEO,SNAPSHOT
+    }
+
+
+    val Types = listOf(
+        Type.SNAPSHOT,
+        Type.AUDIOTEXT,
+        Type.PHOTO,
+        Type.VIDEO
+    )
+
+    fun desc(type: Type): Pair<Int, ImageVector>{
+        return when(type){
+            Type.PHOTO -> {
+                Pair( R.string.dataContainer_Photo,  Icons.Outlined.Photo)
+            }
+            Type.AUDIOTEXT -> {
+                Pair(R.string.dataContainer_AudioText,  Icons.Outlined.Mic)
+            }
+            Type.VIDEO -> {
+                Pair(R.string.dataContainer_Video,  Icons.Outlined.Videocam)
+            }
+            Type.SNAPSHOT -> {
+                Pair(R.string.dataContainer_Screenshot,  Icons.Outlined.Screenshot)
+            }
+        }
+    }
+
 }
 
-fun WriteMemoDataType.getDesc(): Pair<Int, ImageVector>{
-      return  when(this){
-           WriteMemoDataType.PHOTO -> {
-               Pair(R.string.dataContainer_Photo,  Icons.Outlined.Photo)
-           }
-           WriteMemoDataType.AUDIOTEXT -> {
-               Pair(R.string.dataContainer_AudioText,  Icons.Outlined.Mic)
-           }
-           WriteMemoDataType.VIDEO -> {
-               Pair(R.string.dataContainer_Video,  Icons.Outlined.Videocam)
-           }
-           WriteMemoDataType.SNAPSHOT -> {
-               Pair(R.string.dataContainer_Screenshot,  Icons.Outlined.Screenshot)
-           }
-       }
-}
 
-val WriteMemoDataTypeList = listOf(
-    WriteMemoDataType.SNAPSHOT,
-    WriteMemoDataType.AUDIOTEXT,
-    WriteMemoDataType.PHOTO,
-    WriteMemoDataType.VIDEO
-)

@@ -96,7 +96,7 @@ fun GisMemoNavHost(
                     type = NavType.BoolType})
         ){
             ExoplayerCompose(
-                uri = GisMemoDestinations.ExoPlayerView.getUriFromArgs(it.arguments).toUri(),
+                uri = GisMemoDestinations.ExoPlayerView.getUriFromArgs(it.arguments),
                 isVisibleAmplitudes = GisMemoDestinations.ExoPlayerView.getIsVisibleAmplitudesFromArgs(it.arguments)
             )
         }

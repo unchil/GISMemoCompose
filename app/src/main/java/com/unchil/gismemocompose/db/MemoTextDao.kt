@@ -17,6 +17,9 @@ interface MemoTextDao {
     fun select_Flow(id:Long): Flow<List<MEMO_TEXT_TBL>>
 
     @Query("SELECT * FROM MEMO_TEXT_TBL WHERE id = :id ")
+    fun memoTextListFlow(id:Long): Flow<List<MEMO_TEXT_TBL>>
+
+    @Query("SELECT * FROM MEMO_TEXT_TBL WHERE id = :id ")
     fun select(id:Long): List<MEMO_TEXT_TBL>
 
 

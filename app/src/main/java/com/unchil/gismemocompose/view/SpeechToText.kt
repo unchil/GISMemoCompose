@@ -94,7 +94,7 @@ val recognizerIntent =  {
 
 
 @Composable
-fun AudioTextView(data: Pair<String, List<Uri>>){
+fun AudioTextView(data: Pair<String, List<String>>){
 
     val isUsableHaptic = LocalUsableHaptic.current
     val hapticFeedback = LocalHapticFeedback.current
@@ -188,16 +188,16 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
 
     val currentBackStack by navController.currentBackStackEntryAsState()
 
-    var recordingUri: Uri?  by rememberSaveable { mutableStateOf(null) }
+    var recordingUri: String?  by rememberSaveable { mutableStateOf(null) }
 
 
-    val currentAudioTextList = viewModel._currentAudioText.value.toMutableList()
+    val currentAudioTextList = viewModel._currentAudioText
 
-    val audioTextList:MutableList<Pair<String, List<Uri>>>
+    val audioTextList:MutableList<Pair<String, List<String>>>
             =  rememberSaveable { currentAudioTextList }
 
 
-    val audioTextData:Pair<MutableState<String>, MutableList<Uri>>
+    val audioTextData:Pair<MutableState<String>, MutableList<String>>
             =  rememberSaveable { Pair(mutableStateOf(""), mutableListOf()) }
 
 
@@ -215,9 +215,9 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
                 FileManager.getFilePath(context, FileManager.Companion.OUTPUTFILE.AUDIO).let{outputFilePath ->
                     context.contentResolver.openInputStream(uri)?.copyTo(FileOutputStream(outputFilePath))
 
-                    audioTextData.second.add(outputFilePath.toUri())
+                    audioTextData.second.add(outputFilePath)
 
-                    recordingUri = outputFilePath.toUri()
+                    recordingUri = outputFilePath
 
 
                 }

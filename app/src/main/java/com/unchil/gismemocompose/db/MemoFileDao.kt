@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.unchil.gismemocompose.db.entity.MEMO_FILE_TBL
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 
@@ -16,6 +17,10 @@ interface MemoFileDao {
 
     @Query("SELECT * FROM MEMO_FILE_TBL WHERE id = :id ")
     fun select_Flow(id:Long): Flow<List<MEMO_FILE_TBL>>
+
+
+    @Query("SELECT * FROM MEMO_FILE_TBL WHERE id = :id ")
+    fun memoFileListFlow(id:Long): Flow<List<MEMO_FILE_TBL>>
 
     @Query("SELECT * FROM MEMO_FILE_TBL WHERE id =:id")
     fun select(id:Long): List<MEMO_FILE_TBL>

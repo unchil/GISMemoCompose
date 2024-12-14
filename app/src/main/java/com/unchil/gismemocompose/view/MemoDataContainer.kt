@@ -49,10 +49,11 @@ import coil3.size.Size
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.model.MemoData
-import com.unchil.gismemocompose.model.MemoDataContainerUser
+import com.unchil.gismemocompose.model.MemoDataUser
+
 import com.unchil.gismemocompose.model.SnackBarChannelObject
-import com.unchil.gismemocompose.model.WriteMemoDataType
-import com.unchil.gismemocompose.model.WriteMemoDataTypeList
+import com.unchil.gismemocompose.model.WriteMemoData
+
 import com.unchil.gismemocompose.model.getDesc
 
 import com.unchil.gismemocompose.viewmodel.MemoContainerViewModel
@@ -74,7 +75,7 @@ fun MemoDataContainer(
     val viewModel = remember {
         MemoContainerViewModel(
             repository = repository ,
-            user = if (onEvent == null ) MemoDataContainerUser.DetailMemoView else MemoDataContainerUser.WriteMemoView
+            user = if (onEvent == null ) MemoDataUser.DetailMemoView else MemoDataUser.WriteMemoView
         )
     }
 
@@ -91,7 +92,7 @@ fun MemoDataContainer(
     }
 
     val currentTabView = remember {
-        mutableStateOf(WriteMemoDataType.SNAPSHOT)
+        mutableStateOf(WriteMemoData.Type.SNAPSHOT)
     }
 
     val currentTabIndex =  remember {
@@ -104,15 +105,15 @@ fun MemoDataContainer(
         modifier = Modifier
     ) {
 
-        WriteMemoDataTypeList.forEachIndexed { index, it ->
+        WriteMemoData.Types.forEachIndexed { index, it ->
             BottomNavigationItem(
                 icon = {
                     Icon(
-                        imageVector = it.getDesc().second,
-                        contentDescription = context.resources.getString(   it.getDesc().first )
+                        imageVector = WriteMemoData.desc(it).second,
+                        contentDescription = context.resources.getString(   WriteMemoData.desc(it).first )
                     )
                 },
-                label = { Text( context.resources.getString(   it.getDesc().first) ) },
+                label = { Text( context.resources.getString(   WriteMemoData.desc(it).first) ) },
                 selected = currentTabView.value ==  it,
                 onClick = {
                     hapticProcessing()
@@ -128,11 +129,11 @@ fun MemoDataContainer(
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        repeat(WriteMemoDataTypeList.count()) { iteration ->
+        repeat(WriteMemoData.Types.count()) { iteration ->
             Box(
                 modifier = Modifier
                     .height(2.dp)
-                    .fillMaxWidth(1f / (WriteMemoDataTypeList.count() - iteration))
+                    .fillMaxWidth(1f / (WriteMemoData.Types.count() - iteration))
                     .clip(CircleShape)
                     .background(if (currentTabIndex.value == iteration) Color.Red else Color.Transparent))
         }
@@ -140,15 +141,15 @@ fun MemoDataContainer(
 
     val memoData: MutableState<MemoData?> = mutableStateOf(
         when (currentTabView.value){
-            WriteMemoDataType.PHOTO ->  MemoData.Photo(dataList = viewModel.phothoList.collectAsState().value.toMutableList())
-            WriteMemoDataType.AUDIOTEXT -> MemoData.AudioText(dataList = viewModel.audioTextList.collectAsState().value.toMutableList())
-            WriteMemoDataType.VIDEO ->  MemoData.Video(dataList = viewModel.videoList.collectAsState().value.toMutableList())
-            WriteMemoDataType.SNAPSHOT ->  MemoData.SnapShot(dataList = viewModel.snapShotList.collectAsState().value.toMutableList())
+            WriteMemoData.Type.PHOTO ->  MemoData.Photo(dataList = viewModel.photoListStateFlow.collectAsState().value.toMutableList())
+            WriteMemoData.Type.AUDIOTEXT -> MemoData.AudioText(dataList = viewModel.audioTextStateFlow.collectAsState().value.toMutableList())
+            WriteMemoData.Type.VIDEO ->  MemoData.Video(dataList = viewModel.videoListStateFlow.collectAsState().value.toMutableList())
+            WriteMemoData.Type.SNAPSHOT ->  MemoData.SnapShot(dataList = viewModel.snapShotListStateFlow.collectAsState().value.toMutableList())
         }
     )
 
     val onDelete:((page:Int) -> Unit)  =   { page ->
-        if (currentTabView.value ==  WriteMemoDataType.SNAPSHOT ) {
+        if (currentTabView.value ==  WriteMemoData.Type.SNAPSHOT ) {
             deleteHandle?.let {
                 it (page)
             }
@@ -192,7 +193,9 @@ fun PagerSnapShotView(item: MemoData.SnapShot, onDelete:((page:Int) -> Unit)? = 
 
     val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
     val defaultData:Pair<String, Int> =  Pair(
-         context.resources.getString(WriteMemoDataType.SNAPSHOT.getDesc().first )
+         context.resources.getString(
+             WriteMemoData.desc(WriteMemoData.Type.SNAPSHOT).first
+         )
         , item.dataList.size)
     val scrollState = rememberScrollState()
 
@@ -307,7 +310,9 @@ fun PagerAudioTextView(item: MemoData.AudioText, onDelete:((page:Int) -> Unit)? 
 
     val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
     val defaultData:Pair<String, Int> = Pair(
-        context.resources.getString(WriteMemoDataType.AUDIOTEXT.getDesc().first )
+        context.resources.getString(
+            WriteMemoData.desc(WriteMemoData.Type.AUDIOTEXT).first
+        )
         , item.dataList.size)
     val scrollState = rememberScrollState()
 
@@ -436,7 +441,9 @@ fun PagerPhotoView(item: MemoData.Photo, onDelete:((page:Int) -> Unit)? = null, 
     val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
 
     val defaultData:Pair<String, Int> = Pair(
-        context.resources.getString(WriteMemoDataType.PHOTO.getDesc().first )
+        context.resources.getString(
+            WriteMemoData.desc(WriteMemoData.Type.PHOTO).first
+        )
         , item.dataList.size)
 
     val scrollState = rememberScrollState()
@@ -556,7 +563,9 @@ fun PagerVideoView(item: MemoData.Video, onDelete:((page:Int) -> Unit)? = null, 
 
     var videoTrackIndex by remember { mutableStateOf(0) }
     val defaultData:Pair<String, Int> = Pair(
-        context.resources.getString(WriteMemoDataType.VIDEO.getDesc().first )
+        context.resources.getString(
+            WriteMemoData.desc(WriteMemoData.Type.VIDEO).first
+        )
         , item.dataList.size)
 
     Column(

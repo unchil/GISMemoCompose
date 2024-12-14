@@ -2,33 +2,105 @@ package com.unchil.gismemocompose.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.unchil.gismemocompose.data.Repository
-import com.unchil.gismemocompose.model.MemoDataContainerUser
+import com.unchil.gismemocompose.model.MemoDataUser
+import kotlinx.coroutines.flow.MutableStateFlow
+
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MemoContainerViewModel (
     val repository: Repository,
-    val user: MemoDataContainerUser
+    val user: MemoDataUser
 ) : ViewModel() {
 
-    val  phothoList: StateFlow<List<Uri>>
-    val videoList: StateFlow<List<Uri>>
-    val audioTextList: StateFlow<List<Pair<String, List<Uri>>>>
-    val snapShotList: StateFlow<List<Uri>>
+    private val _photoListStateFlow: MutableStateFlow<List<String>>
+            = MutableStateFlow(emptyList())
+
+    val photoListStateFlow: StateFlow<List<String>>
+            = _photoListStateFlow.asStateFlow()
+
+
+    private val _videoListStateFlow: MutableStateFlow<List<String>>
+            = MutableStateFlow(emptyList())
+
+    val videoListStateFlow:  StateFlow<List<String>>
+            = _videoListStateFlow.asStateFlow()
+
+    private val _audioTextStateFlow: MutableStateFlow<List<Pair<String, List<String>>>>
+            = MutableStateFlow(emptyList())
+
+    val audioTextStateFlow: StateFlow<List<Pair<String, List<String>>>>
+            = _audioTextStateFlow.asStateFlow()
+
+
+    private val  _snapShotListStateFlow: MutableStateFlow<List<String>>
+            = MutableStateFlow(emptyList())
+
+    val snapShotListStateFlow:  StateFlow<List<String>>
+            = _snapShotListStateFlow.asStateFlow()
+
 
     init {
         when(user){
-            MemoDataContainerUser.DetailMemoView -> {
-                phothoList  = repository.detailPhoto
-                videoList  = repository.detailVideo
-                audioTextList  = repository.detailAudioText
-                snapShotList  = repository.detailSnapShot
+            MemoDataUser.DetailMemoView -> {
+
+                viewModelScope.launch {
+                    repository.detailVideo.collectLatest { it ->
+                        _videoListStateFlow.value = it
+                    }
+                }
+
+                viewModelScope.launch {
+                    repository.detailAudioText.collectLatest { it ->
+                        _audioTextStateFlow.value = it
+                    }
+                }
+
+                viewModelScope.launch {
+                    repository.detailPhoto.collectLatest { it ->
+                        _photoListStateFlow.value = it
+                    }
+                }
+
+                viewModelScope.launch {
+                    repository.detailSnapShot.collectLatest { it ->
+                        _snapShotListStateFlow.value = it
+                    }
+                }
             }
-            MemoDataContainerUser.WriteMemoView -> {
-                phothoList  = repository.currentPhoto
-                 videoList  = repository.currentVideo
-                 audioTextList  = repository.currentAudioText
-                 snapShotList  = repository.currentSnapShot
+            MemoDataUser.WriteMemoView -> {
+
+                viewModelScope.launch {
+                    repository.currentVideo.collectLatest { it ->
+                        _videoListStateFlow.value = it
+                    }
+                }
+
+                viewModelScope.launch {
+                    repository.currentAudioText.collectLatest { it ->
+                        _audioTextStateFlow.value = it
+                    }
+                }
+
+                viewModelScope.launch {
+                    repository.currentPhoto.collectLatest { it ->
+                        _photoListStateFlow.value = it
+                    }
+                }
+
+                viewModelScope.launch {
+                    repository.currentSnapShot.collectLatest { it ->
+                        _snapShotListStateFlow.value = it
+                    }
+                }
+
+
+
+
             }
         }
     }

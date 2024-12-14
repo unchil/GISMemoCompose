@@ -271,19 +271,19 @@ fun CameraCompose( navController: NavController? = null   ) {
 
     }
 
-    val currentPhotoList = viewModel._currentPhoto.collectAsState().value.toMutableList()
+    val currentPhotoList = viewModel._currentPhoto
 
-    val photoList:MutableList<Uri>
+    val photoList:MutableList<String>
             =  rememberSaveable { mutableListOf() }
 
-    val currentVideoList = viewModel._currentVideo.collectAsState().value.toMutableList()
+    val currentVideoList = viewModel._currentVideo
 
-    val videoList:MutableList<Uri>
+
+    val videoList:MutableList<String>
             =  rememberSaveable { mutableListOf()  }
 
     val findVideoList
             =  rememberSaveable { mutableListOf<Boolean>() }
-
 
     val imageCaptureListener =  object : ImageCapture.OnImageSavedCallback {
         override fun onError(error: ImageCaptureException) { }
@@ -291,8 +291,7 @@ fun CameraCompose( navController: NavController? = null   ) {
             lifecycleOwner.lifecycleScope.launch {
                 outputFileResults.savedUri?.let {uri ->
                     photoPreviewData = uri
-                    photoList.add(uri)
-
+                    photoList.add( uri.encodedPath ?: "")
                     findVideoList.add(isVideoRecording.value)
 
 
@@ -317,7 +316,9 @@ fun CameraCompose( navController: NavController? = null   ) {
                 if (!event.hasError()) {
 
 
-                    videoList.add( event.outputResults.outputUri)
+                    videoList.add(
+                        event.outputResults.outputUri.encodedPath ?: ""
+                    )
 
                     recordingLength = 0
                     videoRecording = null
@@ -485,7 +486,7 @@ fun CameraCompose( navController: NavController? = null   ) {
                                             else -> {
 
                                                 if(findVideoList.last()) {
-                                                    videoList.last().encodedPath?.let {videoUri ->
+                                                    videoList.last().let {videoUri ->
                                                         navController?.navigate(
                                                             GisMemoDestinations.ExoPlayerView.createRoute(
                                                                 videoUri
