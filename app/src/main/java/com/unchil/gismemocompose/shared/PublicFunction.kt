@@ -8,7 +8,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.provider.Settings
-import androidx.activity.ComponentActivity
 import androidx.biometric.BiometricManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -34,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
 import androidx.core.content.FileProvider
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -45,7 +43,6 @@ import com.unchil.gismemocompose.db.LuckMemoDB
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
-
 import java.io.File
 
 
@@ -157,7 +154,7 @@ fun launchIntent_ShareMemo(context: Context, db:LuckMemoDB, memo: MEMO_TBL){
         attachment.forEach {
             attachmentUri.add(
                 FileProvider.getUriForFile(  context,
-                    FILEPROVIDER_AUTHORITY,  File( it.encodedPath?: "")  )
+                    FILEPROVIDER_AUTHORITY,  File(it)  )
             )
         }
 

@@ -1,8 +1,6 @@
 package com.unchil.gismemocompose.data
 
-import android.net.Uri
 import androidx.compose.runtime.compositionLocalOf
-import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -407,13 +405,13 @@ class Repository{
     }
 
 
-      fun getShareMemoData(id:Long, completeHandle:(attachments:ArrayList<Uri>, comments:ArrayList<String>)->Unit )
+      fun getShareMemoData(id:Long, completeHandle:(attachments:ArrayList<String>, comments:ArrayList<String>)->Unit )
         = CoroutineScope(Dispatchers.IO).launch {
-            val attachments = arrayListOf<Uri>()
+            val attachments = arrayListOf<String>()
             val comments = arrayListOf<String>()
 
           database.memoFileDao.select(id).forEach {
-              attachments.add(it.filePath.toUri())
+              attachments.add(it.filePath)
           }
           database.memoTextDao.select(id).forEach {
               comments.add(it.comment)

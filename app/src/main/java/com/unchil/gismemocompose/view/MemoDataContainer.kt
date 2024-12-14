@@ -50,12 +50,8 @@ import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.model.MemoData
 import com.unchil.gismemocompose.model.MemoDataUser
-
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.model.WriteMemoData
-
-import com.unchil.gismemocompose.model.getDesc
-
 import com.unchil.gismemocompose.viewmodel.MemoContainerViewModel
 import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import kotlinx.coroutines.channels.Channel

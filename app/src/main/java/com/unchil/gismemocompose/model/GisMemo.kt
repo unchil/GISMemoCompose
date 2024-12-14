@@ -1,6 +1,5 @@
 package com.unchil.gismemocompose.model
 
-import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Class
 import androidx.compose.material.icons.outlined.Draw

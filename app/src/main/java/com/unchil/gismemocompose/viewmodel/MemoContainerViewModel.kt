@@ -1,12 +1,10 @@
 package com.unchil.gismemocompose.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.model.MemoDataUser
 import kotlinx.coroutines.flow.MutableStateFlow
-
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest

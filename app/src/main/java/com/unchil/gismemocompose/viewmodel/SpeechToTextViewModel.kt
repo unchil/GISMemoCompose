@@ -1,10 +1,8 @@
 package com.unchil.gismemocompose.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unchil.gismemocompose.data.Repository
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SpeechToTextViewModel (  val repository: Repository ) : ViewModel(){

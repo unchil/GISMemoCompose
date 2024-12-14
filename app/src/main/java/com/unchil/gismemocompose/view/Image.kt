@@ -1,7 +1,6 @@
 package com.unchil.gismemocompose.view
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import coil3.SingletonImageLoader
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
@@ -250,8 +248,8 @@ private fun PrevViewMemoData(
             val uriTest= "content://com.google.android.tts.AudioRecordingProvider/my_recordings/recording.amr"
             val url1 =  "file://data/data/com.example.gismemo/files/photos/2023-05-17-13-02-46-802.jpeg"
             val url2 = "https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop"
-            val  url4 = Uri.parse("android.resource://com.example.gismemo/" + R.drawable.outline_perm_media_black_48).toString().toUri()
-            val url3 = url1.toUri()
+        //    val  url4 = Uri.parse("android.resource://com.example.gismemo/" + R.drawable.outline_perm_media_black_48).toString()
+
 
 
             GISMemoTheme {
@@ -259,7 +257,7 @@ private fun PrevViewMemoData(
                     modifier = Modifier.background(color = Color.White)
                 ) {
 
-                ImageViewer(data = url4 , size = Size.ORIGINAL, isZoomable = false)
+                ImageViewer(data = url1 , size = Size.ORIGINAL, isZoomable = false)
                  //   AsyncImage(model = url2, modifier = Modifier.fillMaxSize(), contentDescription = "")
 
                 }

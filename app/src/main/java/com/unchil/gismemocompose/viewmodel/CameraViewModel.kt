@@ -1,12 +1,10 @@
 package com.unchil.gismemocompose.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unchil.gismemocompose.data.Repository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class CameraViewModel  ( val repository: Repository) : ViewModel(){

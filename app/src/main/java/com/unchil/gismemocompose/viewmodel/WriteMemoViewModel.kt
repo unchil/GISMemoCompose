@@ -1,19 +1,17 @@
 package com.unchil.gismemocompose.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.android.gms.maps.model.LatLng
 import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
-
-import com.google.android.gms.maps.model.LatLng
 import com.unchil.gismemocompose.model.WriteMemoData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class WriteMemoViewModel (
     val repository: Repository
