@@ -96,8 +96,6 @@ fun MemoCompose(
     val hapticFeedback = LocalHapticFeedback.current
 
 
-
-
     val permissions = listOf(
         Manifest.permission.USE_BIOMETRIC,
     )

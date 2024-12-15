@@ -101,7 +101,7 @@ fun MemoListScreen(
         val configuration = LocalConfiguration.current
         val isPortrait = remember { mutableStateOf(false) }
         val peekHeight = remember { mutableStateOf(140.dp) }
-        val headerHeight  = remember { mutableStateOf(74.dp) }
+        val headerHeight  = remember { mutableStateOf(110.dp) }
         when (configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> {
                 isPortrait.value = true

@@ -470,10 +470,11 @@ fun SearchCompose(
 
         }
 
-        Divider(
+        HorizontalDivider(
             Modifier
                 .fillMaxWidth()
-                .padding(6.dp) )
+                .padding(6.dp)
+        )
 
         RadioButtonGroupCompose(
             state = secretRadioGroupState,
@@ -513,10 +514,11 @@ fun SearchCompose(
             setState = selectedTagArray,
         )
 
-        Divider(
+        HorizontalDivider(
             Modifier
                 .fillMaxWidth()
-                .padding(6.dp) )
+                .padding(6.dp)
+        )
 
         androidx.compose.material.IconButton(
             onClick = {
