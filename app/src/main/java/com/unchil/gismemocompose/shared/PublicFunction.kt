@@ -4,10 +4,14 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.hardware.biometrics.BiometricPrompt
+import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -38,13 +42,18 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.unchil.gismemocompose.R
+import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.data.RepositoryProvider
 import com.unchil.gismemocompose.db.LuckMemoDB
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
+import com.unchil.gismemocompose.model.BiometricCheckObject
+import com.unchil.gismemocompose.model.BiometricCheckType
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
 import java.io.File
 
+
+val SwipeBoxHeight = 70.dp
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalPermissionsApi::class)
@@ -140,13 +149,11 @@ fun launchIntent_Biometric_Enroll(context: Context){
     context.startActivity(intent)
 }
 
-fun launchIntent_ShareMemo(context: Context, db:LuckMemoDB, memo: MEMO_TBL){
+fun launchIntent_ShareMemo(context: Context, repository: Repository, memo: MEMO_TBL){
 
-     val FILEPROVIDER_AUTHORITY = "com.example.gismemo.fileprovider"
+    val FILEPROVIDER_AUTHORITY = "com.unchil.gismemo_multiplatform.fileprovider"
 
-    val repository = RepositoryProvider.getRepository().apply { database = db }
-
-   // val repository = RepositoryProvider.getRepository(context.applicationContext)
+    // val repository = RepositoryProvider.getRepository(context.applicationContext)
     repository.getShareMemoData(id = memo.id) { attachment, comments ->
 
         val attachmentUri = arrayListOf<Uri>()
@@ -178,6 +185,63 @@ fun launchIntent_ShareMemo(context: Context, db:LuckMemoDB, memo: MEMO_TBL){
     }
 
 }
+
+
+fun BiometricCheckType.getTitle(getString: (Int)->String):Pair<String,String> {
+    return when(this){
+        BiometricCheckType.DETAILVIEW  -> {
+            Pair(getString(R.string.biometric_prompt_detailview_title), getString(R.string.biometric_prompt_detailview_msg))
+        }
+        BiometricCheckType.SHARE -> {
+            Pair(getString(R.string.biometric_prompt_share_title), getString(R.string.biometric_prompt_share_msg))
+        }
+        BiometricCheckType.DELETE -> {
+            Pair(getString(R.string.biometric_prompt_delete_title), getString(R.string.biometric_prompt_delete_msg))
+        }
+    }
+
+}
+
+
+@RequiresApi(Build.VERSION_CODES.R)
+fun biometricPrompt(
+    context: Context,
+    bioMetricCheckType: BiometricCheckObject.Type,
+    onResult: (isSucceeded:Boolean, bioMetricCheckType: BiometricCheckObject.Type, errorMsg:String?  ) ->Unit
+){
+
+
+    val biometricPrompt = BiometricPrompt.Builder(context)
+        .apply {
+            setTitle(BiometricCheckObject.getTitle(bioMetricCheckType, context.resources::getString).first)
+            setSubtitle(BiometricCheckObject.getTitle(bioMetricCheckType, context.resources::getString).second)
+            setDescription(context.resources.getString(R.string.biometric_desc))
+            //BiometricPrompt.PromptInfo.Builder 인스턴스에서는 setNegativeButtonText()와 setAllowedAuthenticators(... or DEVICE_CREDENTIAL)를 동시에 호출할 수 없습니다.
+            setAllowedAuthenticators( android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG or android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            //   setNegativeButton("취소", context.mainExecutor, { _ , _ ->   })
+
+        }.build()
+
+    biometricPrompt.authenticate(android.os.CancellationSignal(), context.mainExecutor,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                onResult(false, bioMetricCheckType,  errString.toString())
+            }
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                onResult(false, bioMetricCheckType, context.resources.getString(R.string.biometric_err_msg))
+            }
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                onResult(true, bioMetricCheckType, null)
+            }
+        }
+    )
+
+
+}
+
 /*
 fun launchIntent_ShareKakao(context: Context, memo: MEMO_TBL) {
 
@@ -212,28 +276,3 @@ fun launchIntent_ShareKakao(context: Context, memo: MEMO_TBL) {
 
  */
 
-/*
-@RequiresApi(Build.VERSION_CODES.R)
-fun launchIntent_BiometricEnRoll(context: Context){
-
-    val intent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
-        putExtra(  Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-            BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL  )
-    }
-
-    /*
-    val reqPermissionResultCode:Int = -1
-
-    ActivityCompat.startActivityForResult(
-        context as FragmentActivity,
-        intent,
-        reqPermissionResultCode,
-        null
-    )
-
-     */
-
-    context.startActivity(intent)
-}
-
- */

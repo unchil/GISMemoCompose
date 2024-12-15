@@ -63,7 +63,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -104,7 +104,7 @@ import kotlinx.coroutines.launch
     ExperimentalPermissionsApi::class
 )
 @Composable
-fun DetailMemoView(navController: NavController, id:Long) {
+fun DetailMemoCompose(navController: NavHostController, id:Long) {
 
     val permissions = listOf(
         Manifest.permission.INTERNET,
@@ -151,13 +151,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing() {
-        if (isUsableHaptic) {
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
+
         val isUsableDarkMode = LocalUsableDarkMode.current
         var isDarkMode by remember{ mutableStateOf(isUsableDarkMode) }
         var mapTypeIndex by rememberSaveable { mutableStateOf(0) }
@@ -243,13 +237,13 @@ fun DetailMemoView(navController: NavController, id:Long) {
             )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    hapticProcessing()
+                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     when (channelData.channelType) {
                         else -> {}
                     }
                 }
                 SnackbarResult.Dismissed -> {
-                    hapticProcessing()
+                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                 }
             }
         }
@@ -258,7 +252,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
 
         val tagDialogDissmissHandler:() -> Unit = {
 
-            hapticProcessing()
+             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
             selectedTags.value.clear()
             var snippetsTemp = ""
             TagInfoDataObject.entries.forEachIndexed { index, item ->
@@ -299,7 +293,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContentColor = MaterialTheme.colorScheme.onSurface,
         sheetContent = {
-            MemoDataContainer()
+            MemoDataCompose()
         },
         sheetDragHandle = {
             Box(
@@ -379,7 +373,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                     .padding(2.dp)
                     .background(color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)),
                 onClick = {
-                    hapticProcessing()
+                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)()
                     isTitleBox = !isTitleBox
                 },
                 content = {
@@ -493,7 +487,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
 
                     IconButton(
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isGoCurrentLocation = true
                         }
                     ) {
@@ -511,7 +505,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                     IconButton(
                         enabled = if(mapTypeIndex == 0) true else false,
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isDarkMode = !isDarkMode
 
                             if (isDarkMode) {
@@ -556,7 +550,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                     ) {
                         IconButton(
                             onClick = {
-                                hapticProcessing()
+                                 hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                 val findType = MapType.entries.first { item ->
                                     mapType.name == item.name
                                 }
@@ -587,7 +581,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
 
                 IconButton(
                     onClick = {
-                        hapticProcessing()
+                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                         isVisibleMenu.value = !isVisibleMenu.value
                         isTitleBox = !isTitleBox
                     }
@@ -605,7 +599,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                     ) {
                         IconButton(
                             onClick = {
-                                hapticProcessing()
+                                 hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                 when (menuType) {
                                     SettingMenuData.Type.SECRET -> {
                                         isLock.value = !isLock.value
@@ -721,7 +715,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
 
                 AnimatedVisibility(visible = isTagDialog) {
 
-                    AssistChipGroupView(
+                    AssistChipGroupCompose(
                         isVisible = isTagDialog,
                         setState = selectedTags,
                     ) {
@@ -745,7 +739,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                                     modifier = Modifier,
                                     onClick = {
                                         isTagDialog = false
-                                        hapticProcessing()
+                                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)()
                                         snippets.value = ""
                                         selectedTags.value.clear()
 
@@ -774,7 +768,7 @@ fun DetailMemoView(navController: NavController, id:Long) {
                                     modifier = Modifier,
                                     onClick = {
                                         isTagDialog = false
-                                        hapticProcessing()
+                                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)()
 
                                         selectedTags.value.clear()
 

@@ -2,7 +2,6 @@ package com.unchil.gismemocompose.view
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,91 +12,93 @@ import com.unchil.gismemocompose.navigation.GisMemoDestinations
 
 
 @Composable
-fun GisMemoNavHost(
+fun GisMemoNavHost (
     navController: NavHostController
 ){
-
     NavHost(
         navController = navController,
-        startDestination = GisMemoDestinations.IntroView.route
-    ) {
+        startDestination = GisMemoDestinations.MemoListScreen.route
+    ){
 
         composable(
-            route = GisMemoDestinations.IntroView.route
+            route = GisMemoDestinations.MemoListScreen.route
         ){
-            IntroView(navController = navController)
+            MemoListScreen(navController = navController)
         }
 
         composable(
-            route = GisMemoDestinations.WriteMemoView.route
+            route = GisMemoDestinations.WriteMemoScreen.route
         ){
-            WriteMemoView(navController = navController)
+            WriteMemoScreen(navController = navController)
         }
 
         composable(
-            route = GisMemoDestinations.MapView.route
+            route = GisMemoDestinations.MapScreen.route
         ){
-            MemoMapView(navController = navController)
+            MemoMapScreen(navController = navController)
         }
 
         composable(
-            route = GisMemoDestinations.SettingView.route
-        ){
-            SettingsView(navController = navController)
-        }
-
-        composable(
-            route = GisMemoDestinations.DetailMemoView.route ,
+            route = GisMemoDestinations.DetailMemo.route,
             arguments = listOf(
-                navArgument(GisMemoDestinations.ARG_NAME_ID){
+                navArgument("id"){
                     nullable = false
-                    type = NavType.StringType } )
-
+                    type = NavType.LongType
+                }
+            )
         ){
-            DetailMemoView(
+            DetailMemoCompose(
                 navController = navController,
-                id = GisMemoDestinations.DetailMemoView.getIDFromArgs(it.arguments).toLong())
+                id = GisMemoDestinations.DetailMemo.getIDFromArgs(it.arguments)
+            )
         }
 
+
         composable(
-            route = GisMemoDestinations.CameraCompose.route
+            route = GisMemoDestinations.SettingScreen.route
         ){
-            CameraCompose( navController = navController)
+            SettingsScreen(navController = navController)
         }
 
+
         composable(
-            route = GisMemoDestinations.SpeechToText.route
+            route = GisMemoDestinations.Camera.route
         ){
-            SpeechRecognizerCompose( navController = navController)
+            CameraCompose(navController = navController)
         }
 
         composable(
-            route =  GisMemoDestinations.PhotoPreview.route,
+            route = GisMemoDestinations.SpeechRecognizer.route
+        ){
+            SpeechRecognizerCompose(navController = navController)
+        }
+
+        composable(
+            route = GisMemoDestinations.ImageViewer.route,
             arguments = listOf(
-                navArgument(GisMemoDestinations.ARG_NAME_FILE_PATH) {
+                navArgument("url") {
                     nullable = false
-                    type = NavType.StringType})
+                    type = NavType.StringType
+                }
+            )
         ){
             ImageViewer(
-                data = GisMemoDestinations.PhotoPreview.getUriFromArgs(it.arguments).toUri(),
-                size = Size.ORIGINAL,
-                isZoomable = true )
+                data = GisMemoDestinations.ImageViewer.getUriFromArgs(it.arguments),
+                size = Size.ORIGINAL
+            )
         }
 
-
         composable(
-            route = GisMemoDestinations.ExoPlayerView.route,
+            route = GisMemoDestinations.ExoPlayer.route,
             arguments = listOf(
-                navArgument(GisMemoDestinations.ARG_NAME_FILE_PATH) {
+                navArgument("url"){
                     nullable = false
-                    type = NavType.StringType},
-                navArgument(GisMemoDestinations.ARG_NAME_ISVISIBLE_AMPLITUDES) {
-                    nullable = false
-                    type = NavType.BoolType})
+                    type = NavType.StringType
+                }
+            )
         ){
             ExoplayerCompose(
-                uri = GisMemoDestinations.ExoPlayerView.getUriFromArgs(it.arguments),
-                isVisibleAmplitudes = GisMemoDestinations.ExoPlayerView.getIsVisibleAmplitudesFromArgs(it.arguments)
+                uri = GisMemoDestinations.ExoPlayer.getUriFromArgs(it.arguments)
             )
         }
 
@@ -105,10 +106,7 @@ fun GisMemoNavHost(
 
     }
 
-
     BackHandler {
-
         navController.popBackStack()
     }
-
 }

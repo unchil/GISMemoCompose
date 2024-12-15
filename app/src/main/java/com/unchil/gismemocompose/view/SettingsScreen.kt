@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -73,6 +74,7 @@ import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.SettingsViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -93,8 +95,21 @@ fun Context.getLanguageArray():Array<String>{
 }
 
 
+fun hapticProcessing(
+    coroutineScope: CoroutineScope,
+    hapticFeedback: HapticFeedback,
+    isUsableHaptic:Boolean
+){
+    if(isUsableHaptic) {
+        coroutineScope.launch {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+    }
+}
+
+
 @Composable
-fun SettingsView(navController: NavHostController){
+fun SettingsScreen(navController: NavHostController){
 // LocalChangeLocale.current 값 호출로 locale 실시간 반영
     val localeChange = LocalChangeLocale.current
     var context = LocalContext.current
@@ -120,13 +135,6 @@ fun SettingsView(navController: NavHostController){
 
     val isAlertDialog = rememberSaveable { mutableStateOf(false) }
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
     val iconIsUsableHaptic: (@Composable () -> Unit)? = if (checkedIsUsableHaptic) {
         {
@@ -209,7 +217,7 @@ fun SettingsView(navController: NavHostController){
             )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     //----------
                     when (channelData.channelType) {
 
@@ -218,7 +226,7 @@ fun SettingsView(navController: NavHostController){
                     //----------
                 }
                 SnackbarResult.Dismissed -> {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                 }
             }
         }
@@ -265,7 +273,7 @@ fun SettingsView(navController: NavHostController){
                             .semantics { contentDescription = "IS Usable Haptic " },
                         checked = checkedIsUsableHaptic,
                         onCheckedChange = {
-                            hapticProcessing()
+                            hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             checkedIsUsableHaptic = it
                             viewModel.onEvent(SettingsViewModel.Event.UpdateIsUsableHaptic(it))
                         },
@@ -293,7 +301,7 @@ fun SettingsView(navController: NavHostController){
                             },
                         checked = checkedIsDarkMode,
                         onCheckedChange = {
-                            hapticProcessing()
+                            hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             checkedIsDarkMode = it
                             viewModel.onEvent(SettingsViewModel.Event.UpdateIsUsableDarkMode(it))
                         },
@@ -320,7 +328,7 @@ fun SettingsView(navController: NavHostController){
                             },
                         checked = checkedIsDynamicColor,
                         onCheckedChange = {
-                            hapticProcessing()
+                            hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             checkedIsDynamicColor = it
                             viewModel.onEvent(SettingsViewModel.Event.UpdateIsDynamicColor(it))
                         },
@@ -346,7 +354,7 @@ fun SettingsView(navController: NavHostController){
                             .scale(1.2f)
                             .fillMaxWidth(0.5f),
                         onClick = {
-                            hapticProcessing()
+                            hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isAlertDialog.value = true
 
                         },
@@ -380,12 +388,11 @@ fun SettingsView(navController: NavHostController){
                 }
 
 
-                RadioButtonGroupView(
+                RadioButtonGroupCompose(
                     state = localeRadioGroupState,
                     data = localeOption,
                     layoutScopeType = "Column"
                 )
-
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp))
 
@@ -421,7 +428,7 @@ fun DeleteConfirmDialog(
     val isUsableHaptic = LocalUsableHaptic.current
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
-
+/*
     fun hapticProcessing() {
         if (isUsableHaptic) {
             coroutineScope.launch {
@@ -429,6 +436,8 @@ fun DeleteConfirmDialog(
             }
         }
     }
+
+ */
 
     AlertDialog(
         onDismissRequest = {
@@ -465,7 +474,8 @@ fun DeleteConfirmDialog(
             TextButton(
 
                 onClick = {
-                    hapticProcessing()
+                //    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     isAlertDialog.value = false
                     //event(SettingsViewModel.Event.clearAllMemo)
                     event?.invoke()
@@ -505,7 +515,7 @@ fun PrevSettingsView(){
                 color = MaterialTheme.colors.onPrimary,
                 contentColor = MaterialTheme.colors.primary
             ) {
-                SettingsView(navController = navController)
+                SettingsScreen(navController = navController)
             }
         }
 

@@ -104,6 +104,7 @@ import com.unchil.gismemocompose.model.BiometricCheckType
 import com.unchil.gismemocompose.model.MapTypeMenuData
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.navigation.GisMemoDestinations
+import com.unchil.gismemocompose.shared.SwipeBoxHeight
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
@@ -116,10 +117,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-
+/*
 fun Location.toLatLng():LatLng{
     return LatLng(this.latitude, this.longitude)
 }
+
+ */
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -310,7 +313,7 @@ Button(
 @OptIn(ExperimentalPermissionsApi::class)
 @Preview
 @Composable
-fun PrevViewMap(){
+fun PrevViewGoogleMap(){
 
      val permissionsManager = PermissionsManager()
 
@@ -391,13 +394,6 @@ fun MemoMapView(navController: NavController){
     val coroutineScope = rememberCoroutineScope()
 
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
     val context = LocalContext.current
 
@@ -452,13 +448,13 @@ fun MemoMapView(navController: NavController){
                 )
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
-                        hapticProcessing()
+                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                         when (channelData.channelType) {
                             else -> {  }
                         }
                     }
                     SnackbarResult.Dismissed -> {
-                        hapticProcessing()
+                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     }
                 }
             }
@@ -520,7 +516,7 @@ fun MemoMapView(navController: NavController){
     val scaffoldState =  rememberBottomSheetScaffoldState( bottomSheetState = sheetState )
 
     val onMapLongClickHandler: (LatLng) -> Unit = {
-        hapticProcessing()
+         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
         currentLocation = it
     }
 
@@ -608,12 +604,12 @@ fun MemoMapView(navController: NavController){
                                 //  icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
                                 draggable = true,
                                 onInfoWindowClick = {
-                                    hapticProcessing()
+                                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                     isMemoCardView.value = false
                                 },
                                 onInfoWindowClose = {},
                                 onInfoWindowLongClick = { marker ->
-                                    hapticProcessing()
+                                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                     isMemoCardView.value = true
                                     isCurrentMemo.value = it.id
                                 },
@@ -653,7 +649,7 @@ fun MemoMapView(navController: NavController){
                             .clip(RoundedCornerShape(2.dp))
                             .background(color =MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isGoCurrentLocation = true
                         //        cameraPositionState.position = defaultCameraPosition
 
@@ -686,7 +682,7 @@ fun MemoMapView(navController: NavController){
 
                             IconButton(
                                 onClick = {
-                                    hapticProcessing()
+                                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                     isGoCurrentLocation = true
                                 }
                             ) {
@@ -706,7 +702,7 @@ fun MemoMapView(navController: NavController){
                             IconButton(
                                 enabled = if(mapTypeIndex == 0) true else false,
                                 onClick = {
-                                    hapticProcessing()
+                                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                     isDarkMode = !isDarkMode
 
                                     if (isDarkMode) {
@@ -749,7 +745,7 @@ fun MemoMapView(navController: NavController){
                             .background(color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp),
                                 shape = ShapeDefaults.ExtraSmall),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isVisibleMenu.value = !isVisibleMenu.value
                         }
                     ) {
@@ -777,7 +773,7 @@ fun MemoMapView(navController: NavController){
                                 visible = isVisibleMenu.value,
                             ) {
                                IconButton(onClick = {
-                                    hapticProcessing()
+                                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                    val findType = MapType.entries.first { item ->
                                        item.name == menuType.name
                                    }
@@ -831,13 +827,6 @@ fun MemoView(
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
 
     val context = LocalContext.current
@@ -873,7 +862,7 @@ fun MemoView(
                                 event(
                                     MemoMapViewModel.Event.ToRoute(
                                         navController = it,
-                                        route = GisMemoDestinations.DetailMemoView.createRoute( id= item.id.toString() )
+                                        route = GisMemoDestinations.DetailMemo.createRoute( id= item.id )
                                     )
                                 )
                             }
@@ -898,7 +887,7 @@ fun MemoView(
         onClick = {
 
 
-            hapticProcessing()
+             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
             if(item.isSecret && checkBiometricSupport()) {
                 biometricPrompt(context, BiometricCheckType.DETAILVIEW, onResult)
             }else {
@@ -907,7 +896,7 @@ fun MemoView(
                         event(
                             MemoMapViewModel.Event.ToRoute(
                                 navController = it,
-                                route = GisMemoDestinations.DetailMemoView.createRoute( id= item.id.toString() )
+                                route = GisMemoDestinations.DetailMemo.createRoute( id= item.id )
                             )
                         )
                     }

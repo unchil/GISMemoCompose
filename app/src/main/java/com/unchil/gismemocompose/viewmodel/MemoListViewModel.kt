@@ -7,22 +7,24 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.unchil.gismemocompose.data.Repository
 import com.unchil.gismemocompose.db.entity.MEMO_TBL
-import com.unchil.gismemocompose.view.QueryData
+import com.unchil.gismemocompose.model.SearchQueryData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ListViewModel(val repository:Repository, ) : ViewModel() {
+class MemoListViewModel(val repository:Repository, ) : ViewModel() {
 
 
+    private val _isRefreshingStateFlow: MutableStateFlow<Boolean>
+            = MutableStateFlow(false)
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
+    val isRefreshingStateFlow: StateFlow<Boolean>
+            = _isRefreshingStateFlow.asStateFlow()
 
-    val memoListPaging :Flow<PagingData<MEMO_TBL>>
+    var memoPagingStream :Flow<PagingData<MEMO_TBL>>
 
-    val searchQueryFlow:Flow<Event.Search>
+    private val searchQueryFlow:Flow<Event.Search>
 
     val eventHandler: (Event) -> Unit
 
@@ -41,23 +43,25 @@ class ListViewModel(val repository:Repository, ) : ViewModel() {
             .filterIsInstance<Event.Search>()
             .distinctUntilChanged()
             .onStart {
-                emit(Event.Search(queryDataList = mutableListOf()))
+                emit(Event.Search(queryData = SearchQueryData))
             }
 
         //  3.  viewModelScope.launch { searchMemo() }
-        memoListPaging = searchQueryFlow
+        memoPagingStream = searchQueryFlow
             .flatMapLatest {
-                searchMemo(queryDataList = it.queryDataList)
+                searchMemo(queryData = it.queryData)
             }.cachedIn(viewModelScope)
 
+        /*
+cachedIn(viewModelScope)
+A common use case for this caching is to cache PagingData in a ViewModel.
+This can ensure that, upon configuration change (e.g. rotation),
+then new Activity will receive the existing data immediately
+rather than fetching it from scratch.
+ */
+
     }
 
-    private fun searchMemo(queryDataList:MutableList<QueryData>): Flow<PagingData<MEMO_TBL>> {
-        _isRefreshing.value = true
-        val result = repository.getMemoListStream(queryDataList)
-        _isRefreshing.value = false
-        return result
-    }
 
     fun onEvent(event: Event) {
         when (event) {
@@ -65,6 +69,12 @@ class ListViewModel(val repository:Repository, ) : ViewModel() {
                 toRoute(event.navController, event.route)
             }
             is Event.DeleteItem -> deleteItem(event.id)
+            is Event.Search -> {
+                searchMemoRefresh(queryData = event.queryData)
+            }
+
+
+
             is Event.SetFiles -> setFiles(event.id)
             is Event.SetMemo -> setMemo(event.id)
 
@@ -72,18 +82,20 @@ class ListViewModel(val repository:Repository, ) : ViewModel() {
         }
     }
 
-
-    private fun setMemo(id:Long){
-        viewModelScope.launch {
-            repository.setMemo(id = id)
-        }
+    private fun searchMemo(queryData: SearchQueryData): Flow<PagingData<MEMO_TBL>> {
+        _isRefreshingStateFlow.value = true
+        val result = repository.getMemoListStream(queryData = SearchQueryData)
+        _isRefreshingStateFlow.value = false
+        return result
     }
 
-    private fun setFiles(id:Long){
-        viewModelScope.launch {
-            repository.setFiles(id = id)
-        }
+    private fun searchMemoRefresh(queryData: SearchQueryData) {
+        _isRefreshingStateFlow.value = true
+        memoPagingStream = repository.getMemoListStream(queryData = SearchQueryData)
+        _isRefreshingStateFlow.value = false
+
     }
+
 
     private fun deleteItem(id:Long){
         viewModelScope.launch {
@@ -99,13 +111,32 @@ class ListViewModel(val repository:Repository, ) : ViewModel() {
 
 
 
+
+    private fun setMemo(id:Long){
+        viewModelScope.launch {
+            repository.setMemo(id = id)
+        }
+    }
+
+    private fun setFiles(id:Long){
+        viewModelScope.launch {
+            repository.setFiles(id = id)
+        }
+    }
+
+
+
     sealed class Event {
+
         data class ToRoute(val navController: NavController, val route:String) : Event()
         data class DeleteItem(val id:Long): Event()
+        data class Search(val queryData:SearchQueryData) : Event()
+
+
+
+
         data class  SetMemo(val id: Long): Event()
         data class  SetFiles(val id: Long): Event()
-
-        data class Search(val queryDataList:MutableList<QueryData>) : Event()
 
     }
 

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Toll
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.unchil.gismemocompose.R
@@ -138,10 +139,10 @@ object CreateMenuData {
                 Pair(Icons.Outlined.Screenshot,  null)
             }
             Type.RECORD -> {
-                Pair(Icons.Outlined.Mic,  GisMemoDestinations.SpeechToText.route)
+                Pair(Icons.Outlined.Mic,  GisMemoDestinations.SpeechRecognizer.route)
             }
             Type.CAMERA -> {
-                Pair(Icons.Outlined.Videocam, GisMemoDestinations.CameraCompose.route)
+                Pair(Icons.Outlined.Videocam, GisMemoDestinations.Camera.route)
             }
         }
     }
@@ -228,3 +229,83 @@ object WriteMemoData {
 }
 
 
+object MemoBgObject {
+    enum class Type {
+        SHARE,DELETE
+    }
+    fun desc(type:Type):Pair<String, ImageVector>{
+        return when(type){
+            Type.SHARE -> {
+                Pair(type.name,  Icons.Rounded.Share)
+            }
+            Type.DELETE -> {
+                Pair(type.name,   Icons.Rounded.Delete)
+            }
+        }
+    }
+
+}
+
+
+object SearchQueryData {
+    enum class Type {
+        TITLE, SECRET, MARKER, TAG, DATE
+    }
+    val Types = listOf(
+        Type.TITLE,
+        Type.SECRET,
+        Type.MARKER,
+        Type.TAG,
+        Type.DATE
+    )
+
+    val value = mutableMapOf<Type, Any>()
+
+    fun clear(){
+        value.clear()
+    }
+}
+
+
+data class RadioGroupOption (
+    val title:String,
+    val entries:List<String>,
+    val icon:ImageVector? = null,
+    val iconDesc:String? = null ,
+    val contents:@Composable() (() -> Unit)? = null
+)
+
+
+
+object BiometricCheckObject {
+    enum class Type {
+        DETAILVIEW, SHARE, DELETE
+    }
+    fun getTitle(type:Type, getStringFunc:(Int)->String ) : Pair<String, String> {
+        return when(type){
+            Type.DETAILVIEW -> {
+                Pair(
+                    getStringFunc(R.string.biometric_prompt_detailview_title),
+                    getStringFunc(R.string.biometric_prompt_detailview_msg)
+                )
+            }
+            Type.SHARE -> {
+                Pair(getStringFunc(R.string.biometric_prompt_share_title), getStringFunc(R.string.biometric_prompt_share_msg))
+            }
+            Type.DELETE ->  {
+                Pair(getStringFunc(R.string.biometric_prompt_delete_title), getStringFunc(R.string.biometric_prompt_delete_msg))
+            }
+        }
+    }
+}
+
+
+
+object MainTabObject {
+    val Types:List<GisMemoDestinations> = listOf(
+        GisMemoDestinations.MemoListScreen,
+        GisMemoDestinations.WriteMemoScreen,
+        GisMemoDestinations.MapScreen,
+        GisMemoDestinations.SettingScreen
+    )
+}

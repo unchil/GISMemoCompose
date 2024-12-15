@@ -6,7 +6,9 @@ import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STR
 import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.hardware.biometrics.BiometricPrompt
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,7 @@ import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.unchil.gismemocompose.R
 
+@RequiresApi(Build.VERSION_CODES.R)
 fun biometricPrompt(
     context: Context,
     bioMetricCheckType: BiometricCheckType,

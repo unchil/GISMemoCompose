@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class MemoContainerViewModel (
+class MemoDataViewModel (
     val repository: Repository,
     val user: MemoDataUser
 ) : ViewModel() {

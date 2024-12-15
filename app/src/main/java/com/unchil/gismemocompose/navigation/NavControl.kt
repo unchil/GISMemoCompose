@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ViewStream
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -31,159 +32,87 @@ fun NavHostController.navigateTo(route: String) =
     }
 
 
-/*
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.animated_composable(
-    route: String,
-    arguments: List<NamedNavArgument> = listOf(),
-    content: @Composable AnimatedVisibilityScope.(NavBackStackEntry) -> Unit
-){
-    val animSpec: FiniteAnimationSpec<IntOffset> = tween(500, easing = FastOutSlowInEasing)
-
-    composable(
-        route,
-        arguments = arguments,
-        enterTransition = {
-            slideInHorizontally(
-                initialOffsetX = { screenWidth -> screenWidth },
-                animationSpec = animSpec
-            )
-        },
-        popEnterTransition = {
-            slideInHorizontally(
-                initialOffsetX = { screenWidth -> -screenWidth },
-                animationSpec = animSpec
-            )
-        },
-        exitTransition = {
-            slideOutHorizontally(
-                targetOffsetX = { screenWidth -> -screenWidth },
-                animationSpec = animSpec
-            )
-        },
-        popExitTransition = {
-            slideOutHorizontally(
-                targetOffsetX = { screenWidth -> screenWidth },
-                animationSpec = animSpec
-            )
-        },
-        content = content
-    )
-}
-
- */
-
-
-val mainScreens:List<GisMemoDestinations> = listOf(
-    GisMemoDestinations.IntroView,
-    GisMemoDestinations.WriteMemoView,
-    GisMemoDestinations.MapView,
-    GisMemoDestinations.SettingView
-)
-
 sealed class GisMemoDestinations(
     val route:String,
     val name:Int = 0,
-    val icon:ImageVector? = null,
-
+    val icon: ImageVector? = null,
 ){
 
-    object IntroView : GisMemoDestinations(
-        route = "introview",
+    object MemoListScreen : GisMemoDestinations(
+        route = "list",
         name = R.string.mainmenu_list,
-        icon = Icons.AutoMirrored.Outlined.FormatListBulleted
+        icon = Icons.Outlined.ViewStream
     )
 
-
-    object WriteMemoView : GisMemoDestinations(
-        route = "writememo",
+    object WriteMemoScreen : GisMemoDestinations(
+        route = "write",
         name = R.string.mainmenu_write,
         icon = Icons.Outlined.EditNote
     )
 
-
-    object MapView : GisMemoDestinations(
-        route = "mapview",
+    object MapScreen : GisMemoDestinations(
+        route = "map",
         name = R.string.mainmenu_map,
         icon = Icons.Outlined.Map
     )
 
-    object SettingView : GisMemoDestinations(
-        route = "settings",
+    object SettingScreen : GisMemoDestinations(
+        route = "setting",
         name = R.string.mainmenu_setting,
         icon = Icons.Outlined.Settings
     )
 
-    object SpeechToText : GisMemoDestinations ( route = "voicerecording")
+    object SpeechRecognizer : GisMemoDestinations (
+        route = "speechrecognizer"
+    )
 
-    object CameraCompose : GisMemoDestinations ( route = "camerapreview")
+    object Camera : GisMemoDestinations (
+        route = "camera"
+    )
 
-    object PhotoPreview : GisMemoDestinations( route = "photopreview?${ARG_NAME_FILE_PATH}={$ARG_NAME_FILE_PATH}") {
-
+    object ImageViewer : GisMemoDestinations(
+        route = "imageviewer?{url}"
+    ) {
         fun createRoute(filePath: Any): String {
             val path = when(filePath){
                 is Int -> {
-                    Uri.parse("android.resource://com.example.gismemo/" + filePath.toString()).toString()
+                    Uri.parse(
+                        "android.resource://com.unchil.gismemo_multiplatform.android/"
+                                + filePath.toString()
+                    ).toString()
                 }
                 else -> {
                     ( filePath as Uri).encodedPath
                 }
             }
-            return "photopreview?${ARG_NAME_FILE_PATH}=${path}"
+            return "imageviewer?$path"
         }
-
-        val createRouteNew: (filePath: Any) ->  String  = { filePath ->
-            val path = when(filePath){
-                is Int -> {
-                    Uri.parse("android.resource://com.example.gismemo/" + filePath.toString()).toString()
-                }
-                else -> {
-                    ( filePath as Uri).encodedPath
-                }
-            }
-            "photopreview?${ARG_NAME_FILE_PATH}=${path}"
-        }
-
-
         fun getUriFromArgs(bundle: Bundle?): String {
-            return bundle?.getString(ARG_NAME_FILE_PATH) ?: ""
+            return bundle?.getString("url") ?: ""
         }
+
     }
 
-    object ExoPlayerView : GisMemoDestinations( route = "exoplayerview?${ARG_NAME_FILE_PATH}={$ARG_NAME_FILE_PATH}&${ARG_NAME_ISVISIBLE_AMPLITUDES}={$ARG_NAME_ISVISIBLE_AMPLITUDES}"  ) {
-
-        fun createRoute(filePath: String, isVisibleAmplitudes:Boolean = false): String {
-            return "exoplayerview?${ARG_NAME_FILE_PATH}=${filePath}&${ARG_NAME_ISVISIBLE_AMPLITUDES}=${isVisibleAmplitudes}"
+    object ExoPlayer : GisMemoDestinations(
+        route = "exoplayer?{url}"
+    ) {
+        fun createRoute(filePath: String): String {
+            return "exoplayer?$filePath"
         }
-
         fun getUriFromArgs(bundle: Bundle?): String {
-            return  bundle?.getString(ARG_NAME_FILE_PATH) ?: ""
-        }
-
-        fun getIsVisibleAmplitudesFromArgs(bundle: Bundle?): Boolean {
-            return  bundle?.getBoolean(ARG_NAME_ISVISIBLE_AMPLITUDES) ?: false
+            return  bundle?.getString("url") ?: ""
         }
     }
 
-    object DetailMemoView : GisMemoDestinations(  route = "detailmemoview?${ARG_NAME_ID}={$ARG_NAME_ID}"  ) {
-
-        fun createRoute(id: String) :String {
-            return "detailmemoview?${ARG_NAME_ID}=${id}"
+    object DetailMemo : GisMemoDestinations(
+        route = "detailmemo?{id}"
+    ){
+        fun createRoute(id: Long) :String {
+            return "detailmemo?$id"
         }
-
-        fun getIDFromArgs(bundle: Bundle?): String {
-            return bundle?.getString(ARG_NAME_ID) ?: ""
+        fun getIDFromArgs(bundle: Bundle?): Long {
+            return bundle?.getLong("id") ?: 0L
         }
-
     }
-
-
-    companion object {
-        const val ARG_NAME_ID: String = "id"
-        const val ARG_NAME_FILE_PATH: String = "url"
-        const val ARG_NAME_ISVISIBLE_AMPLITUDES:String = "isvisibleamplitudes"
-    }
-
 
 }
-

@@ -85,7 +85,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -145,7 +145,7 @@ import java.util.Locale
     ExperimentalPermissionsApi::class
 )
 @Composable
-fun WriteMemoView(navController: NavController ){
+fun WriteMemoScreen(navController: NavHostController){
 
 
     val permissions = listOf(
@@ -483,7 +483,7 @@ fun WriteMemoView(navController: NavController ){
             modifier = Modifier.statusBarsPadding(),
             scaffoldState = scaffoldState,
             sheetContent = {
-                MemoDataContainer(
+                MemoDataCompose(
                     onEvent = viewModel::onEvent,
                     deleteHandle = deleteSnapshotHandle,
                     channel = channel
@@ -1038,7 +1038,7 @@ fun WriteMemoView(navController: NavController ){
 
                         AnimatedVisibility(visible = isTagDialog) {
 
-                            AssistChipGroupView(
+                            AssistChipGroupCompose(
                                 isVisible = isTagDialog,
                                 setState = selectedTagArray,
                             ) {
@@ -1100,13 +1100,7 @@ fun ConfirmDialog(
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing() {
-        if (isUsableHaptic) {
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
+
 
 
     val titleTimeStamp = SimpleDateFormat(
@@ -1172,7 +1166,7 @@ fun ConfirmDialog(
                             IconButton(
                                 modifier = Modifier,
                                 onClick = {
-                                    hapticProcessing()
+                                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                     titleText.value = ""
                                     startLauncherRecognizerIntent.launch(recognizerIntent())
                                 },
@@ -1189,7 +1183,7 @@ fun ConfirmDialog(
 
                             IconButton(
                                 onClick = {
-                                    hapticProcessing()
+                                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                     titleText.value = ""
                                 }) {
                                 Icon(
@@ -1222,7 +1216,7 @@ fun ConfirmDialog(
                     TextButton(
 
                         onClick = {
-                            hapticProcessing()
+                            hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isAlertDialog.value = false
                             cancelSnapShot.invoke()
                         }
@@ -1239,7 +1233,7 @@ fun ConfirmDialog(
                     TextButton(
 
                         onClick = {
-                            hapticProcessing()
+                            hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             isAlertDialog.value = false
                             onEvent(titleText.value)
                         }
@@ -1282,7 +1276,7 @@ fun PrevWriteMemo(){
                     color = MaterialTheme.colors.onPrimary,
                     contentColor = MaterialTheme.colors.primary
                 ) {
-                    WriteMemoView(navController = navController)
+                    WriteMemoScreen(navController = navController)
                 }
             }
 

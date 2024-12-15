@@ -202,16 +202,6 @@ fun CameraCompose( navController: NavController? = null   ) {
     }
 
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
-
-
-
     val permissions =
         remember { listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO) }
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions)
@@ -398,7 +388,7 @@ fun CameraCompose( navController: NavController? = null   ) {
                         contentColor = Color.Black
                     ),
                     onClick = {
-                        hapticProcessing()
+                        hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                         torchState.value = when (torchState.value) {
                             TorchState.OFF -> TorchState.ON
                             else -> TorchState.OFF
@@ -475,7 +465,7 @@ fun CameraCompose( navController: NavController? = null   ) {
                                     data = photoPreviewData,
                                     onPhotoPreviewTapped = {
 
-                                        hapticProcessing()
+                                        hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
 
                                         when (it) {
                                             is Int -> {}
@@ -484,14 +474,14 @@ fun CameraCompose( navController: NavController? = null   ) {
                                                 if(findVideoList.last()) {
                                                     videoList.last().let {videoUri ->
                                                         navController?.navigate(
-                                                            GisMemoDestinations.ExoPlayerView.createRoute(
+                                                            GisMemoDestinations.ExoPlayer.createRoute(
                                                                 videoUri
                                                             )
                                                         )
                                                     }
                                                 } else {
                                                     navController?.navigate(
-                                                        GisMemoDestinations.PhotoPreview.createRoute(
+                                                        GisMemoDestinations.ImageViewer.createRoute(
                                                             it
                                                         )
                                                     )
@@ -565,27 +555,27 @@ fun CameraCompose( navController: NavController? = null   ) {
                 recordingStatus = recordingStatus.value,
                 showFlipIcon = isDualCamera.value,
                 onRecordTapped = {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     takeVideo()
                 },
                 onPauseTapped = {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     videoRecording?.pause()
                     recordingStatus.value = RecordingStatus.Paused
                 },
                 onResumeTapped = {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     videoRecording?.resume()
                     recordingStatus.value = RecordingStatus.InProgress
                 },
                 onStopTapped = {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     videoRecording?.stop()
                     recordingStarted.value = false
                     recordingStatus.value = RecordingStatus.Idle
                 },
                 onFlipTapped = {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     if(videoRecording == null ) {
                         cameraSelector.value = when (cameraSelector.value) {
                             CameraSelector.DEFAULT_BACK_CAMERA -> CameraSelector.DEFAULT_FRONT_CAMERA
@@ -594,7 +584,7 @@ fun CameraCompose( navController: NavController? = null   ) {
                     }
                 },
                 onCaptureTapped = {
-                    hapticProcessing()
+                    hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
 
                     isVideoRecording.value = false
                     takePicture()

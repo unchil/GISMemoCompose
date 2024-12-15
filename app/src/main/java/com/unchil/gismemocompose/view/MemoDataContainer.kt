@@ -52,7 +52,7 @@ import com.unchil.gismemocompose.model.MemoData
 import com.unchil.gismemocompose.model.MemoDataUser
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.model.WriteMemoData
-import com.unchil.gismemocompose.viewmodel.MemoContainerViewModel
+import com.unchil.gismemocompose.viewmodel.MemoDataViewModel
 import com.unchil.gismemocompose.viewmodel.WriteMemoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun MemoDataContainer(
+fun MemoDataCompose(
     onEvent:((WriteMemoViewModel.Event)->Unit)? = null,
     deleteHandle:((index:Int)->Unit)? = null,
     channel: Channel<Int>? = null){
@@ -69,7 +69,7 @@ fun MemoDataContainer(
 
     val repository = LocalRepository.current
     val viewModel = remember {
-        MemoContainerViewModel(
+        MemoDataViewModel(
             repository = repository ,
             user = if (onEvent == null ) MemoDataUser.DetailMemoView else MemoDataUser.WriteMemoView
         )
@@ -79,13 +79,6 @@ fun MemoDataContainer(
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
     val currentTabView = remember {
         mutableStateOf(WriteMemoData.Type.SNAPSHOT)
@@ -112,7 +105,7 @@ fun MemoDataContainer(
                 label = { Text( context.resources.getString(   WriteMemoData.desc(it).first) ) },
                 selected = currentTabView.value ==  it,
                 onClick = {
-                    hapticProcessing()
+                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     currentTabView.value = it
                     currentTabIndex.value = index
                 },
@@ -179,13 +172,6 @@ fun PagerSnapShotView(item: MemoData.SnapShot, onDelete:((page:Int) -> Unit)? = 
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
     val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
     val defaultData:Pair<String, Int> =  Pair(
@@ -221,7 +207,7 @@ fun PagerSnapShotView(item: MemoData.SnapShot, onDelete:((page:Int) -> Unit)? = 
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             it(pagerState.currentPage)
                             channel?.let { channel ->
 
@@ -296,13 +282,7 @@ fun PagerAudioTextView(item: MemoData.AudioText, onDelete:((page:Int) -> Unit)? 
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
+
 
     val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
     val defaultData:Pair<String, Int> = Pair(
@@ -338,7 +318,7 @@ fun PagerAudioTextView(item: MemoData.AudioText, onDelete:((page:Int) -> Unit)? 
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             it(pagerState.currentPage)
                             channel?.let { channel ->
 
@@ -426,13 +406,7 @@ fun PagerPhotoView(item: MemoData.Photo, onDelete:((page:Int) -> Unit)? = null, 
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
+
 
     val pagerState  =   rememberPagerState(initialPage = 0){item.dataList.size}
 
@@ -470,7 +444,7 @@ fun PagerPhotoView(item: MemoData.Photo, onDelete:((page:Int) -> Unit)? = null, 
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             it(pagerState.currentPage)
                             channel?.let { channel ->
                                 channel.trySend(SnackBarChannelObject.entries.first { item ->
@@ -549,13 +523,7 @@ fun PagerVideoView(item: MemoData.Video, onDelete:((page:Int) -> Unit)? = null, 
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
+
 
     var videoTrackIndex by remember { mutableStateOf(0) }
     val defaultData:Pair<String, Int> = Pair(
@@ -591,7 +559,7 @@ fun PagerVideoView(item: MemoData.Video, onDelete:((page:Int) -> Unit)? = null, 
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             it(videoTrackIndex)
                             channel?.let { channel ->
                                 channel.trySend(SnackBarChannelObject.entries.first { item ->

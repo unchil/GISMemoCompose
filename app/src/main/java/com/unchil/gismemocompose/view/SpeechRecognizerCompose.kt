@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,7 +61,6 @@ import com.unchil.gismemocompose.shared.composables.PermissionsManager
 import com.unchil.gismemocompose.shared.utils.FileManager
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.SpeechToTextViewModel
-import kotlinx.coroutines.launch
 import java.io.FileOutputStream
 import java.util.Locale
 
@@ -97,13 +95,6 @@ fun AudioTextView(data: Pair<String, List<String>>){
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
     var speechInput =  rememberSaveable { data.first }
 //    val recordingUri: List<Uri>  = rememberSaveable { data.second }
@@ -123,7 +114,7 @@ fun AudioTextView(data: Pair<String, List<String>>){
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        hapticProcessing()
+                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     speechInput = ""
                 }) {
                     Icon(
@@ -162,14 +153,6 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
     val isUsableHaptic = LocalUsableHaptic.current
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
-
-    fun hapticProcessing(){
-        if(isUsableHaptic){
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
-    }
 
 
     val permissions =  remember { listOf(Manifest.permission.RECORD_AUDIO) }
@@ -289,7 +272,7 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
                     trailingIcon = {
                         IconButton(
                             onClick = {
-                                hapticProcessing()
+                                 hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                                 audioTextData.first.value  = ""
                             }
                         ) {
@@ -312,7 +295,7 @@ fun SpeechRecognizerCompose(navController: NavController   ) {
                     IconButton(
                         modifier = Modifier.scale(1.5f),
                         onClick = {
-                            hapticProcessing()
+                             hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                             startLauncherRecognizerIntent.launch(recognizerIntent)
                                   },
                         content = {

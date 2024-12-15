@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-12T02:56:38.100711Z">
+        <DropdownSelection timestamp="2024-12-14T03:19:50.712292Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/unchil/.android/avd/Medium_Phone_API_35_2.avd" />
@@ -14,6 +14,12 @@
         <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="PrevSearchCompose">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="PrevMemoCompose">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -4,6 +4,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.PagingSource
 import androidx.room.withTransaction
 import com.unchil.gismemocompose.BuildConfig
 import com.unchil.gismemocompose.api.OpenWeatherInterface
@@ -11,6 +12,7 @@ import com.unchil.gismemocompose.api.RetrofitAdapter
 import com.unchil.gismemocompose.db.CURRENTWEATHER_TBL
 import com.unchil.gismemocompose.db.LuckMemoDB
 import com.unchil.gismemocompose.db.entity.*
+import com.unchil.gismemocompose.model.SearchQueryData
 import com.unchil.gismemocompose.model.WriteMemoData
 import com.unchil.gismemocompose.model.toCURRENTWEATHER_TBL
 import com.unchil.gismemocompose.view.*
@@ -606,64 +608,58 @@ class Repository{
     }
 
 
+    fun getMemoListStream(queryData: SearchQueryData): Flow<PagingData<MEMO_TBL>> {
 
-     fun getMemoListPaging(): Flow<PagingData<MEMO_TBL>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 30,
-                enablePlaceholders = false  ),
-            pagingSourceFactory = {   database.memoDao.select_All_Paging() }
-        ).flow
-    }
-
-
-    fun getMemoListStream(queryDataList:MutableList<QueryData>): Flow<PagingData<MEMO_TBL>> {
-
-       return  if( queryDataList.isEmpty()) {
-            getMemoListPaging()
+       return  if(SearchQueryData.value.isEmpty() ){
+           Pager(
+               config = PagingConfig(
+                   pageSize = 30,
+                   enablePlaceholders = false
+               ),
+               pagingSourceFactory = {
+                   database.memoDao.select_All_Paging()
+               }
+           ).flow
         } else {
-            var tagArray = arrayListOf(10000)
+           var title = "% %"
+           var tagArray = arrayListOf(10000)
            var secretArray  = arrayListOf(0,1)
            var markerArray = arrayListOf(0,1)
-           var title = "% %"
            var fromDate = 0L
            var toDate = System.currentTimeMillis()
 
-           queryDataList.forEachIndexed { index, pair ->
-               when(pair.first){
-                   SearchOption.TITLE -> {
-                       title = if((pair.second as SearchQueryDataValue.titleOption).title.isNotEmpty()) {
-                            "%" +  (pair.second as SearchQueryDataValue.titleOption).title.replace(
-                               ' ','%' )  + "%"
-                       }else {
-                           "% %"
+           SearchQueryData.Types.forEach {
+               when(it){
+                   SearchQueryData.Type.TITLE -> {
+                       if (SearchQueryData.value.containsKey(SearchQueryData.Type.TITLE)) {
+                           val tempTitle = SearchQueryData.value[SearchQueryData.Type.TITLE].toString()
+                           title = "%" + tempTitle.replace(' ','%' )  + "%"
                        }
                    }
-                   SearchOption.SECRET -> {
+                   SearchQueryData.Type.SECRET -> {
+                       if (SearchQueryData.value.containsKey(SearchQueryData.Type.SECRET)) {
+                           val secretIndex = SearchQueryData.value[SearchQueryData.Type.SECRET] as Long
+                           secretArray =  if(secretIndex == 0L) arrayListOf(1) else arrayListOf(0)
+                       }
+                   }
+                   SearchQueryData.Type.MARKER -> {
+                       if ( SearchQueryData.value.containsKey(SearchQueryData.Type.MARKER)){
+                           val markerIndex = SearchQueryData.value[SearchQueryData.Type.MARKER] as Long
+                           markerArray = if(markerIndex == 0L) arrayListOf(1) else arrayListOf(0)
+                       }
 
-                       if ((pair.second as SearchQueryDataValue.radioGroupOption).index < secretArray.size) {
-                           secretArray = if ((pair.second as SearchQueryDataValue.radioGroupOption).index == 0) {
-                               arrayListOf(1)
-                           }else{
-                               arrayListOf(0)
-                           }
+                   }
+                   SearchQueryData.Type.TAG -> {
+                       if (SearchQueryData.value.containsKey(SearchQueryData.Type.TAG)) {
+                           tagArray = SearchQueryData.value[SearchQueryData.Type.TAG] as ArrayList<Int>
                        }
                    }
-                   SearchOption.MARKER -> {
-                       if ((pair.second as SearchQueryDataValue.radioGroupOption).index < markerArray.size) {
-                           markerArray = if ((pair.second as SearchQueryDataValue.radioGroupOption).index == 0) {
-                               arrayListOf(1)
-                           }else{
-                               arrayListOf(0)
-                           }
+                   SearchQueryData.Type.DATE -> {
+                       if ( SearchQueryData.value.containsKey(SearchQueryData.Type.DATE)) {
+                           val tempDate = SearchQueryData.value[SearchQueryData.Type.DATE] as Pair<Long, Long>
+                           fromDate = tempDate.first
+                           toDate = tempDate.second
                        }
-                   }
-                   SearchOption.TAG -> {
-                       tagArray = (pair.second as SearchQueryDataValue.tagOption).indexList
-                   }
-                   SearchOption.DATE -> {
-                       fromDate = (pair.second as SearchQueryDataValue.dateOption).fromToDate.first
-                       toDate =  (pair.second as SearchQueryDataValue.dateOption).fromToDate.second
                    }
                }
            }
@@ -671,7 +667,8 @@ class Repository{
             Pager(
                config = PagingConfig(
                    pageSize = 30,
-                   enablePlaceholders = false  ),
+                   enablePlaceholders = false
+               ),
                pagingSourceFactory = {
                    database.memoDao.select_Search_Paging(
                        tagArray,
@@ -683,6 +680,7 @@ class Repository{
                    )
                }
            ).flow
+
         }
 
     }
