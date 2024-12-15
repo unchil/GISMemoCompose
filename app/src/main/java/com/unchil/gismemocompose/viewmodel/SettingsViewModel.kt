@@ -53,7 +53,7 @@ class SettingsViewModel ( val repository: Repository) : ViewModel() {
 
 
     private fun updateOnChangeLocale (onChangeLocale:Boolean) {
-        repository.updateOnChangeLocale(onChangeLocale)
+        repository.updateRealTimeChangeLocale(onChangeLocale)
     }
 
     private fun updateIsChangeLocale (isChangeLocale:Int) {

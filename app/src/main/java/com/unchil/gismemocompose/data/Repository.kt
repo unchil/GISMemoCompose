@@ -49,9 +49,6 @@ class Repository{
             = MutableStateFlow(false)
 
 
-    val onChangeLocale: MutableStateFlow<Boolean>
-            = MutableStateFlow(false)
-
     val isFirstSetup:MutableStateFlow<Boolean>
             = MutableStateFlow(true)
 
@@ -114,9 +111,7 @@ class Repository{
         isUsableDynamicColor.value = value
     }
 
-    fun updateOnChangeLocale(value:Boolean){
-        onChangeLocale.value = value
-    }
+
 
     fun updateIsChangeLocale(value:Int){
         isChangeLocale.value = value

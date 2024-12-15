@@ -2,7 +2,9 @@ package com.unchil.gismemocompose.shared
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.hardware.biometrics.BiometricPrompt
 import android.location.Location
@@ -54,6 +56,21 @@ import java.io.File
 
 
 val SwipeBoxHeight = 70.dp
+
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("no activity")
+}
+
+
+fun Context.getLanguageArray():Array<String>{
+    return resources.getStringArray(R.array.Language_Array)
+}
+
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalPermissionsApi::class)

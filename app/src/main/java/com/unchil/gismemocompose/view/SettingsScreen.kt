@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -72,6 +73,7 @@ import com.unchil.gismemocompose.data.LocalRepository
 import com.unchil.gismemocompose.model.SnackBarChannelObject
 import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
+import com.unchil.gismemocompose.shared.getLanguageArray
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -80,19 +82,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-fun Context.findActivity(): Activity {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is Activity) return context
-        context = context.baseContext
-    }
-    throw IllegalStateException("no activity")
-}
-
-
-fun Context.getLanguageArray():Array<String>{
-    return resources.getStringArray(R.array.Language_Array)
-}
 
 
 fun hapticProcessing(
@@ -428,21 +417,11 @@ fun DeleteConfirmDialog(
     val isUsableHaptic = LocalUsableHaptic.current
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
-/*
-    fun hapticProcessing() {
-        if (isUsableHaptic) {
-            coroutineScope.launch {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-        }
+
+
+    BasicAlertDialog(onDismissRequest = {
+        isAlertDialog.value = false
     }
-
- */
-
-    AlertDialog(
-        onDismissRequest = {
-            isAlertDialog.value = false
-        }
     ) {
 
 
@@ -474,7 +453,7 @@ fun DeleteConfirmDialog(
             TextButton(
 
                 onClick = {
-                //    hapticProcessing()
+
                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)
                     isAlertDialog.value = false
                     //event(SettingsViewModel.Event.clearAllMemo)
@@ -492,7 +471,6 @@ fun DeleteConfirmDialog(
         }
 
 
-
     }
 
 
@@ -506,8 +484,12 @@ fun DeleteConfirmDialog(
 fun PrevSettingsView(){
     val permissionsManager = PermissionsManager()
     val navController = rememberNavController()
+    val repository = LocalRepository.current
 
-    CompositionLocalProvider(LocalPermissionsManager provides permissionsManager) {
+    CompositionLocalProvider(
+        LocalPermissionsManager provides permissionsManager,
+        LocalRepository provides repository
+    ) {
 
         GISMemoTheme {
             Surface(

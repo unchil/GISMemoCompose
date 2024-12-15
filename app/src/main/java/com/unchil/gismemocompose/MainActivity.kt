@@ -58,9 +58,10 @@ import com.unchil.gismemocompose.shared.ChkNetWork
 import com.unchil.gismemocompose.shared.checkInternetConnected
 import com.unchil.gismemocompose.shared.composables.LocalPermissionsManager
 import com.unchil.gismemocompose.shared.composables.PermissionsManager
+import com.unchil.gismemocompose.shared.getLanguageArray
 import com.unchil.gismemocompose.ui.theme.GISMemoTheme
 import com.unchil.gismemocompose.view.GisMemoNavHost
-import com.unchil.gismemocompose.view.getLanguageArray
+
 import com.unchil.gismemocompose.view.hapticProcessing
 import com.unchil.gismemocompose.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
