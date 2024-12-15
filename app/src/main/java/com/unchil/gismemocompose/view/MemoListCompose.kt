@@ -133,7 +133,7 @@ fun MemoListCompose(
                     verticalArrangement = Arrangement.SpaceBetween,
                     contentPadding = PaddingValues(
                         horizontal = 2.dp,
-                        vertical = 2.dp
+                        vertical = 0.dp
                     )
                 ) {
                     items(memoListStream.itemCount) {index ->

@@ -480,7 +480,7 @@ fun WriteMemoScreen(navController: NavHostController){
 
 
         BottomSheetScaffold(
-            modifier = Modifier.statusBarsPadding(),
+            modifier = Modifier,
             scaffoldState = scaffoldState,
             sheetContent = {
                 MemoDataCompose(

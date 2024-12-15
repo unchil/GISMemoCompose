@@ -303,7 +303,7 @@ fun MemoMapScreen(navController: NavHostController){
         }
 
         BottomSheetScaffold(
-            modifier = Modifier.statusBarsPadding(),
+            modifier = Modifier,
             topBar = topMenu,
             scaffoldState = scaffoldState,
             sheetContent = {
