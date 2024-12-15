@@ -8,6 +8,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarDefaults.inputFieldColors
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -387,88 +389,101 @@ fun SearchCompose(
     ) {
 
         SearchBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = if (isVisibleSearchBar.value) 0.dp else 8.dp),
-            query = query_title.value,
-            onQueryChange = {
-                query_title.value = it
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = query_title.value,
+                    onQueryChange = {
+                        query_title.value = it
+                    },
+                    onSearch = onSearch,
+                    expanded = isVisibleSearchBar.value,
+                    onExpandedChange = {
+                        isVisibleSearchBar.value = it
+                    },
+                    enabled = true,
+                    placeholder = placeholder,
+                    leadingIcon = leadingIcon,
+                    trailingIcon = trailingIcon,
+                    colors =  inputFieldColors(),
+                    interactionSource = null,
+                )
             },
-            onSearch = onSearch,
-            active = isVisibleSearchBar.value,
-            onActiveChange = {
+            expanded = isVisibleSearchBar.value,
+            onExpandedChange = {
                 isVisibleSearchBar.value = it
             },
-            placeholder = placeholder,
-            leadingIcon = leadingIcon,
-            trailingIcon = trailingIcon,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding( horizontal = if (isVisibleSearchBar.value) 0.dp else 10.dp),
+            shape = SearchBarDefaults.inputFieldShape,
+            colors = SearchBarDefaults.colors(),
             tonalElevation = 2.dp,
-            colors = SearchBarDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                dividerColor = MaterialTheme.colorScheme.tertiary
-            )
-        ){
+            shadowElevation = SearchBarDefaults.ShadowElevation,
+            windowInsets = SearchBarDefaults.windowInsets,
+            content = {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-            Column(
-                modifier = Modifier
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                    val size = historyItems.size
 
-                val size = historyItems.size
+                    for (i in 1..size) {
+                        val index = size - i
+                        val historyItem = historyItems[index]
 
-                for ( i in 1.. size){
-                    val index = size - i
-                    val historyItem = historyItems[index]
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 6.dp) ,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-
-                        ) {
-
-                        Icon(
+                        Row(
                             modifier = Modifier
-                                .clickable {  historyItems.removeAt(index) },
-                            imageVector = Icons.Default.History,
-                            contentDescription = null
-                        )
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
 
-                        Text(text = historyItem)
+                            ) {
 
-                        Icon(
-                            modifier = Modifier
-                                .clickable {  query_title.value = historyItem },
-                            imageVector = Icons.Default.NorthWest,
-                            contentDescription = null
-                        )
+                            Icon(
+                                modifier = Modifier
+                                    .clickable { historyItems.removeAt(index) },
+                                imageVector = Icons.Default.History,
+                                contentDescription = null
+                            )
 
+                            Text(text = historyItem)
+
+                            Icon(
+                                modifier = Modifier
+                                    .clickable { query_title.value = historyItem },
+                                imageVector = Icons.Default.NorthWest,
+                                contentDescription = null
+                            )
+
+                        }
                     }
+
+
+                    if (historyItems.isNotEmpty()) {
+                        Text(
+                            text = "clear all history",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp)
+                                .clickable { historyItems.clear() },
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+
                 }
-
-
-                if(historyItems.isNotEmpty()){
-                    Text(
-                        text = "clear all history",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 10.dp)
-                            .clickable { historyItems.clear() },
-                        textAlign = TextAlign.Center
-                    )
-                }
+            },
+        )
 
 
 
-            }
 
 
-        }
 
         HorizontalDivider(
             Modifier
