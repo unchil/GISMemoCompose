@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Api
@@ -58,7 +57,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -86,11 +84,11 @@ import com.unchil.gismemocompose.LocalUsableDarkMode
 import com.unchil.gismemocompose.LocalUsableHaptic
 import com.unchil.gismemocompose.R
 import com.unchil.gismemocompose.data.LocalRepository
-import com.unchil.gismemocompose.model.TagInfoDataObject
 import com.unchil.gismemocompose.db.entity.toCURRENTWEATHER_TBL
 import com.unchil.gismemocompose.model.MapTypeMenuData
 import com.unchil.gismemocompose.model.SettingMenuData
 import com.unchil.gismemocompose.model.SnackBarChannelObject
+import com.unchil.gismemocompose.model.TagInfoDataObject
 import com.unchil.gismemocompose.shared.composables.CheckPermission
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredCompose
 import com.unchil.gismemocompose.shared.composables.PermissionRequiredComposeFuncName
@@ -288,7 +286,7 @@ fun DetailMemoCompose(navController: NavHostController, id:Long) {
         val density = LocalDensity.current
 
     BottomSheetScaffold(
-        modifier = Modifier.statusBarsPadding(),
+        modifier = Modifier,
         scaffoldState = scaffoldState,
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContentColor = MaterialTheme.colorScheme.onSurface,
@@ -365,37 +363,6 @@ fun DetailMemoCompose(navController: NavHostController, id:Long) {
                 )
 
             }
-
-            /*
-            androidx.compose.material.IconButton(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(2.dp)
-                    .background(color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)),
-                onClick = {
-                     hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)()
-                    isTitleBox = !isTitleBox
-                },
-                content = {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Description,
-                            contentDescription = "titleBox"
-                        )
-                        Text("Memo Description")
-                        Icon(
-                            modifier = Modifier,
-                            imageVector = if (isTitleBox) Icons.Outlined.UnfoldLess else Icons.Outlined.UnfoldMore,
-                            contentDescription = "titleBox "
-                        )
-                    }
-                })
-
-             */
-
 
 
 
@@ -719,95 +686,7 @@ fun DetailMemoCompose(navController: NavHostController, id:Long) {
                         isVisible = isTagDialog,
                         setState = selectedTags,
                     ) {
-/*
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.Center)
-                        ) {
 
-                            Divider()
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-
-
-                                IconButton(
-                                    modifier = Modifier,
-                                    onClick = {
-                                        isTagDialog = false
-                                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)()
-                                        snippets.value = ""
-                                        selectedTags.value.clear()
-
-                                        viewModel.onEvent(
-                                            DetailMemoViewModel.Event.UpdateTagList(
-                                                id,
-                                                arrayListOf(),
-                                                snippets.value
-                                            )
-                                        )
-
-                                    },
-                                    content = {
-                                        Icon(
-                                            modifier = Modifier,
-                                            imageVector = Icons.Outlined.Replay,
-                                            contentDescription = "Clear"
-                                        )
-                                    }
-                                )
-
-
-
-
-                                IconButton(
-                                    modifier = Modifier,
-                                    onClick = {
-                                        isTagDialog = false
-                                         hapticProcessing(coroutineScope, hapticFeedback, isUsableHaptic)()
-
-                                        selectedTags.value.clear()
-
-                                        var snippetsTemp = ""
-                                        tagInfoDataList.forEachIndexed { index, tagInfoData ->
-                                            if (tagInfoData.isSet.value) {
-                                                snippetsTemp = "${snippetsTemp } #${  context.resources.getString( tagInfoDataList[index].name)   }"
-                                                selectedTags.value.add(index)
-                                            }
-                                        }
-
-                                        snippets.value = snippetsTemp
-
-                                        viewModel.onEvent(
-                                            DetailMemoViewModel.Event.UpdateTagList(
-                                                id,
-                                                selectedTags.value,
-                                                snippets.value
-                                            )
-                                        )
-                                    },
-                                    content = {
-                                        Icon(
-                                            modifier = Modifier,
-                                            imageVector = Icons.Outlined.PublishedWithChanges,
-                                            contentDescription = "Save"
-                                        )
-                                    }
-                                )
-
-
-
-
-                            }
-
-
-                        }
-
- */
                     }
 
 

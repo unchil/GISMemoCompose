@@ -5,6 +5,7 @@ plugins {
 
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.secretsGradle)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 android {
@@ -108,7 +109,11 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.ktor)
     implementation(libs.ktor.client.android)
-
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
 
 

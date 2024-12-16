@@ -4,18 +4,22 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import androidx.room.withTransaction
 import com.unchil.gismemocompose.BuildConfig
-import com.unchil.gismemocompose.api.OpenWeatherInterface
-import com.unchil.gismemocompose.api.RetrofitAdapter
+import com.unchil.gismemocompose.api.GisMemoApi
 import com.unchil.gismemocompose.db.CURRENTWEATHER_TBL
 import com.unchil.gismemocompose.db.LuckMemoDB
-import com.unchil.gismemocompose.db.entity.*
+import com.unchil.gismemocompose.db.entity.CURRENTLOCATION_TBL
+import com.unchil.gismemocompose.db.entity.MEMO_FILE_TBL
+import com.unchil.gismemocompose.db.entity.MEMO_TAG_TBL
+import com.unchil.gismemocompose.db.entity.MEMO_TBL
+import com.unchil.gismemocompose.db.entity.MEMO_TEXT_TBL
+import com.unchil.gismemocompose.db.entity.MEMO_WEATHER_TBL
+import com.unchil.gismemocompose.db.entity.toMEMO_WEATHER_TBL
 import com.unchil.gismemocompose.model.SearchQueryData
 import com.unchil.gismemocompose.model.WriteMemoData
 import com.unchil.gismemocompose.model.toCURRENTWEATHER_TBL
-import com.unchil.gismemocompose.view.*
+import com.unchil.gismemocompose.view.DrawingPolyline
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -24,13 +28,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-
 val LocalRepository = compositionLocalOf<Repository> { error("Not Found Handler Repository") }
 
 
 class Repository{
 
-
+    private val api = GisMemoApi()
     lateinit var database:LuckMemoDB
 
 
@@ -444,41 +447,7 @@ class Repository{
     }
 
     suspend fun setFiles(id:Long){
-        /*
-        database.memoFileDao.select_Flow(id).collectLatest {
 
-            val currentSnapShotList = it.filter { it.type ==  WriteMemoDataType.SNAPSHOT.name}.map { it.filePath.toUri() }.sorted()
-            detailSnapShot.emit( currentSnapShotList )
-
-            val currentPhotoList = it.filter { it.type ==  WriteMemoDataType.PHOTO.name}.map { it.filePath.toUri() }.sorted()
-            detailPhoto.emit(  currentPhotoList )
-
-            val currentVideoList = it.filter { it.type ==  WriteMemoDataType.VIDEO.name}.map { it.filePath.toUri() }.sorted()
-            detailVideo.emit(  currentVideoList  )
-
-            database.memoTextDao.select_Flow(id).collectLatest {memoTextTblList ->
-
-                val audiTextList = mutableListOf<Pair<String,List<Uri>>>()
-                val audioTextFileList = it.filter { it.type ==  WriteMemoDataType.AUDIOTEXT.name}
-
-                memoTextTblList.forEach {commentList ->
-                    audiTextList.add(
-                        Pair(
-                            commentList.comment,
-                            audioTextFileList.filter {
-                                it.index == commentList.index
-                            }.map {
-                                it.filePath.toUri()
-                            }.sorted()
-                        )
-                    )
-                }
-                detailAudioText.value = audiTextList
-            }
-
-        }
-
-         */
 
         database.memoFileDao.memoFileListFlow(id).collectLatest { it ->
             val currentSnapShotList = it.filter {
@@ -542,16 +511,6 @@ class Repository{
 
     suspend fun updateTagList(id:Long, selectTagList: ArrayList< Int>, snippets:String){
 
-        /*
-        var snippets = ""
-
-        selectTagList.forEach {
-            snippets = "${snippets} #${tagInfoDataList[it].name}"
-        }
-
-         */
-
-
 
        val memoTagTblList = mutableListOf(MEMO_TAG_TBL(id = id, index = 10000))
        selectTagList.forEach {
@@ -585,21 +544,28 @@ class Repository{
         val OPENWEATHER_KEY = BuildConfig.OPENWEATHER_KEY
         val OPENWEATHER_UNITS = "metric"
 
-        val service = RetrofitAdapter.create( service = OpenWeatherInterface::class.java, url = OPENWEATHER_URL)
 
-        val apiResponse = service.getWeatherData(
-            latitude = latitude,
-            longitude = longitude,
-            units = OPENWEATHER_UNITS,
-            apiKey = OPENWEATHER_KEY
-        )
+        try {
+            val apiResponse = api.getWeatherData(
+                lat = latitude,
+                lon = longitude,
+                units = OPENWEATHER_UNITS,
+                appid = OPENWEATHER_KEY
+            )
 
-        database.withTransaction {
-            database.currentWeatherDao.delete()
-            database.currentWeatherDao.insert(apiResponse.toCURRENTWEATHER_TBL())
+
+            database.withTransaction {
+                database.currentWeatherDao.delete()
+                database.currentWeatherDao.insert(apiResponse.toCURRENTWEATHER_TBL())
+            }
+
+            _currentWeather.emit(apiResponse.toCURRENTWEATHER_TBL())
+
+        } catch(e:Exception){
+            val message = e.localizedMessage
         }
 
-        _currentWeather.emit(apiResponse.toCURRENTWEATHER_TBL())
+
     }
 
 

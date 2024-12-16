@@ -6,5 +6,5 @@ plugins {
     // Appended
     alias(libs.plugins.google.devtools.ksp) apply false
     alias(libs.plugins.secretsGradle) apply false
-
+    alias(libs.plugins.kotlinSerialization).apply(false)
 }

@@ -2,9 +2,10 @@ package com.unchil.gismemocompose.model
 
 import com.unchil.gismemocompose.db.CURRENTWEATHER_TBL
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 
-
+@Serializable
 data class CurrentWeather(
     @SerializedName("coord") var coord: Coord,
     @SerializedName("weather") var weather: List<Weather>,
@@ -23,13 +24,13 @@ data class CurrentWeather(
 //   var snow: Snow,
 
 )
-
+@Serializable
 data class Coord (
     @SerializedName("lon") var lon: Float, //City geo location, longitude
     @SerializedName("lat") var lat: Float //City geo location, latitude
 )
 
-
+@Serializable
 data class Weather ( //more info Weather condition codes
     
     @SerializedName("id") var id: Int, //Weather condition id
@@ -37,7 +38,7 @@ data class Weather ( //more info Weather condition codes
     @SerializedName("description") var description: String, //Weather condition within the group. You can get the
     @SerializedName("icon") var icon : String //Weather icon id
 )
-
+@Serializable
 data class Main (
     @SerializedName("temp") var temp: Float, //Temperature. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
     @SerializedName("feels_like") var feels_like: Float, //Temperature. This temperature parameter accounts for the human perception of weather. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
@@ -48,17 +49,17 @@ data class Main (
     //  var sea_level: String, //Atmospheric pressure on the sea level, hPa
     //  var grnd_level: String //Atmospheric pressure on the ground level, hPa
 )
-
+@Serializable
 data class Wind (
     @SerializedName("speed") var speed : Float, //Wind speed. Unit Default: meter/sec, Metric: meter/sec, Imperial: miles/hour.
     @SerializedName("deg") var deg : Float //Wind direction, degrees (meteorological)
     //  var gust : String //Wind gust. Unit Default: meter/sec, Metric: meter/sec, Imperial:miles/hour
 )
-
+@Serializable
 data class Clouds (
     @SerializedName("all") var all  : Int //Cloudiness, %
 )
-
+@Serializable
 data class Sys (
     //   var type : Int, //Internal parameter
 //    var id : Int, //Internal parameter
