@@ -3,6 +3,8 @@
 
 #### Kotlin Compose RoomDatabase Flow Paging Coil Ktor Exoplayer SpeechRecognizer Camera GoogleMap OpenWeather
 
+## Release
+DownLoad App : [GISMemo][release]
 
 ## Description
 
@@ -39,6 +41,7 @@ secrets.properties
 ```
 
 
+
 ###  Video
 |Write|Detail|Map|Setting|
 |:-:|:-:|:-:|:-:|
@@ -59,6 +62,6 @@ secrets.properties
 **SPDX-License-Identifier: MIT**
 
 
-[release]: https://play.google.com/store/apps/details?id=com.unchil.gismemo&pcampaignid=web_share "GIS MEMO"
+[release]: https://drive.google.com/file/d/1donPTB4q8Zxbk6cbbzsssfk42TWmd-yD/view?usp=drive_link "GIS MEMO"
 [googlelink]: https://developers.google.com/maps "Go GoogleMap"
 [openweatherlink]: https://openweathermap.org/ "Go OpenWeatherMap"
