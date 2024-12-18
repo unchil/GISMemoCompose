@@ -1,71 +1,71 @@
 package com.unchil.gismemocompose.model
 
 import com.unchil.gismemocompose.db.CURRENTWEATHER_TBL
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 
 @Serializable
 data class CurrentWeather(
-    @SerializedName("coord") var coord: Coord,
-    @SerializedName("weather") var weather: List<Weather>,
-    @SerializedName("base") var base: String, //Internal parameter
-    @SerializedName("main") var main: Main,
-    @SerializedName("visibility") var visibility: Int, // visibility
-    @SerializedName("wind") var wind: Wind,
-    @SerializedName("clouds") var clouds: Clouds,
-    @SerializedName("dt") var dt: Long, //Time of data calculation, unix, UTC
-    @SerializedName("sys") var sys: Sys,
-    @SerializedName("timezone") var timezone: Long, //Shift in seconds from UTC
-    @SerializedName("id") var id: Long, //City ID
-    @SerializedName("name") var name: String, //City name
-    @SerializedName("cod") var cod: Int // Return Result Code
+    @SerialName("coord") var coord: Coord,
+    @SerialName("weather") var weather: List<Weather>,
+    @SerialName("base") var base: String, //Internal parameter
+    @SerialName("main") var main: Main,
+    @SerialName("visibility") var visibility: Int, // visibility
+    @SerialName("wind") var wind: Wind,
+    @SerialName("clouds") var clouds: Clouds,
+    @SerialName("dt") var dt: Long, //Time of data calculation, unix, UTC
+    @SerialName("sys") var sys: Sys,
+    @SerialName("timezone") var timezone: Long, //Shift in seconds from UTC
+    @SerialName("id") var id: Long, //City ID
+    @SerialName("name") var name: String, //City name
+    @SerialName("cod") var cod: Int // Return Result Code
 //   var rain: Rain,
 //   var snow: Snow,
 
 )
 @Serializable
 data class Coord (
-    @SerializedName("lon") var lon: Float, //City geo location, longitude
-    @SerializedName("lat") var lat: Float //City geo location, latitude
+    @SerialName("lon") var lon: Float, //City geo location, longitude
+    @SerialName("lat") var lat: Float //City geo location, latitude
 )
 
 @Serializable
 data class Weather ( //more info Weather condition codes
     
-    @SerializedName("id") var id: Int, //Weather condition id
-    @SerializedName("main") var main: String, //Group of weather parameters (Rain, Snow, Extreme etc.)
-    @SerializedName("description") var description: String, //Weather condition within the group. You can get the
-    @SerializedName("icon") var icon : String //Weather icon id
+    @SerialName("id") var id: Int, //Weather condition id
+    @SerialName("main") var main: String, //Group of weather parameters (Rain, Snow, Extreme etc.)
+    @SerialName("description") var description: String, //Weather condition within the group. You can get the
+    @SerialName("icon") var icon : String //Weather icon id
 )
 @Serializable
 data class Main (
-    @SerializedName("temp") var temp: Float, //Temperature. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
-    @SerializedName("feels_like") var feels_like: Float, //Temperature. This temperature parameter accounts for the human perception of weather. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
-    @SerializedName("pressure") var pressure: Float, //Atmospheric pressure (on the sea level, if there is no sea_level or grnd_level data), hPa
-    @SerializedName("humidity") var humidity: Float, //Humidity, %
-    @SerializedName("temp_min") var temp_min: Float, //Minimum temperature at the moment. This is minimal currently observed temperature (within large megalopolises and urban areas). Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
-    @SerializedName("temp_max") var temp_max: Float //Maximum temperature at the moment. This is maximal currently observed temperature (within large megalopolises and urban areas). Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
+    @SerialName("temp") var temp: Float, //Temperature. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
+    @SerialName("feels_like") var feels_like: Float, //Temperature. This temperature parameter accounts for the human perception of weather. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
+    @SerialName("pressure") var pressure: Float, //Atmospheric pressure (on the sea level, if there is no sea_level or grnd_level data), hPa
+    @SerialName("humidity") var humidity: Float, //Humidity, %
+    @SerialName("temp_min") var temp_min: Float, //Minimum temperature at the moment. This is minimal currently observed temperature (within large megalopolises and urban areas). Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
+    @SerialName("temp_max") var temp_max: Float //Maximum temperature at the moment. This is maximal currently observed temperature (within large megalopolises and urban areas). Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.
     //  var sea_level: String, //Atmospheric pressure on the sea level, hPa
     //  var grnd_level: String //Atmospheric pressure on the ground level, hPa
 )
 @Serializable
 data class Wind (
-    @SerializedName("speed") var speed : Float, //Wind speed. Unit Default: meter/sec, Metric: meter/sec, Imperial: miles/hour.
-    @SerializedName("deg") var deg : Float //Wind direction, degrees (meteorological)
+    @SerialName("speed") var speed : Float, //Wind speed. Unit Default: meter/sec, Metric: meter/sec, Imperial: miles/hour.
+    @SerialName("deg") var deg : Float //Wind direction, degrees (meteorological)
     //  var gust : String //Wind gust. Unit Default: meter/sec, Metric: meter/sec, Imperial:miles/hour
 )
 @Serializable
 data class Clouds (
-    @SerializedName("all") var all  : Int //Cloudiness, %
+    @SerialName("all") var all  : Int //Cloudiness, %
 )
 @Serializable
 data class Sys (
     //   var type : Int, //Internal parameter
 //    var id : Int, //Internal parameter
-    @SerializedName("country") var country : String, //Country code (GB, JP etc.)
-    @SerializedName("sunrise") var sunrise : Long, //Sunrise time, unix, UTC
-    @SerializedName("sunset") var sunset : Long //Sunset time, unix, UTC
+    @SerialName("country") var country : String, //Country code (GB, JP etc.)
+    @SerialName("sunrise") var sunrise : Long, //Sunrise time, unix, UTC
+    @SerialName("sunset") var sunset : Long //Sunset time, unix, UTC
     //    var message : Float, //Internal parameter
 )
 

@@ -11,19 +11,17 @@ composeBom = "2024.12.01"
 ## Appended
 room = "2.6.1"
 ksp = "2.1.0-1.0.29"
-paging = "3.3.4"
+paging = "3.3.5"
 appcompat = "1.7.0"
 accompanist = "0.36.0"
 biometric = "1.4.0-alpha02"
-retrofit2 = "2.9.0"
-okhttp3 = "4.9.0"
 play-services-location= "21.3.0"
 play-services-maps = "19.0.0"
 google-maps-utils = "3.5.2"
 google-maps-compose = "2.11.2"
-camera = "1.4.0"
+camera = "1.4.1"
 concurrent = "1.2.0"
-navigation = "2.8.4"
+navigation = "2.8.5"
 coil3 = "3.0.4"
 ktor = "3.0.2"
 secrets-gradle-plugin = "2.0.1"
@@ -62,10 +60,6 @@ androidx-material-icons = { group = "androidx.compose.material", name = "materia
 androidx-animation = { group = "androidx.compose.animation", name = "animation"}
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation"}
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout"}
-squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2"}
-squareup-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit2"}
-squareup-retrofit-mock = { group = "com.squareup.retrofit2", name = "retrofit-mock", version.ref = "retrofit2"}
-squareup-okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp3"}
 google-android-gms-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location"}
 google-android-gms-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "play-services-maps"}
 google-maps-utils = { group = "com.google.maps.android", name = "android-maps-utils", version.ref = "google-maps-utils"}
